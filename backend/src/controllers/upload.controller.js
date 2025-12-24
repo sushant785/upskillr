@@ -2,10 +2,11 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3 from "../config/s3.js";
 import crypto from "crypto";
+import Lesson from '../models/Lesson.model.js'
 
 export const generateUploadUrl = async (req, res) => {
   try {
-    const { fileType } = req.body;
+    const { course , title , order , fileType } = req.body;
 
     if (!fileType) {
       return res.status(400).json({ message: "fileType is required" });
@@ -25,9 +26,15 @@ export const generateUploadUrl = async (req, res) => {
       expiresIn: 300
     });
 
-    res.status(200).json({
+    
+     const lesson = await Lesson.create({course , title , videoUrl:fileKey , order });
+     console.log(lesson)
+     let lesson_order = lesson.order
+     
+     res.status(200).json({
       uploadUrl,
-      fileKey
+      fileKey,
+      lesson_order
     });
 
   } catch (error) {
