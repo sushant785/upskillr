@@ -12,7 +12,7 @@ export const generateUploadUrl = async (req, res) => {
       return res.status(400).json({ message: "fileType is required" });
     }
 
-    const fileExtension = fileType.split("/")[1];
+    const fileExtension = fileType.split("/")[1]; 
 
     const fileKey = `videos/${crypto.randomUUID()}.${fileExtension}`;
 
