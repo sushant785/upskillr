@@ -6,34 +6,50 @@ import Lesson from '../models/Lesson.model.js'
 
 export const generateUploadUrl = async (req, res) => {
   try {
-    const { course , title , order , fileType } = req.body;
+    const { course , title , order , fileTypeMain , fileTypeResource } = req.body;
 
-    if (!fileType) {
+    if (!fileTypeMain || !fileTypeResource ) {
       return res.status(400).json({ message: "fileType is required" });
     }
 
-    const fileExtension = fileType.split("/")[1];
+    const fileExtensionMain = fileTypeMain.split("/")[1]; 
+    const fileExtensionResource = fileTypeResource.split("/")[1]; 
 
-    const fileKey = `videos/${crypto.randomUUID()}.${fileExtension}`;
+    const fileKeyMain = `videos/${crypto.randomUUID()}.${fileExtensionMain}`;
+    const fileKeyResource = `attachment/${crypto.randomUUID()}.${fileExtensionResource}`;
 
-    const command = new PutObjectCommand({
+
+    const commandMain = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileKey,
-      ContentType: fileType
+      Key: fileKeyMain,
+      ContentType: fileTypeMain
     });
 
-    const uploadUrl = await getSignedUrl(s3, command, {
+    const uploadUrlMain = await getSignedUrl(s3, commandMain, {
+      expiresIn: 1000
+    });
+
+    const commandResource = new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileKeyResource
+    });
+
+    const uploadUrlResource = await getSignedUrl(s3, commandResource, {
       expiresIn: 300
     });
+    
+
 
     
-     const lesson = await Lesson.create({course , title , videoUrl:fileKey , order });
+     const lesson = await Lesson.create({course , title , videoUrl:fileKeyMain , attachment: fileKeyResource ,order});
      console.log(lesson)
      let lesson_order = lesson.order
      
      res.status(200).json({
-      uploadUrl,
-      fileKey,
+      uploadUrlMain,
+      fileKeyMain,
+      uploadUrlResource,
+      fileKeyResource,
       lesson_order
     });
 
