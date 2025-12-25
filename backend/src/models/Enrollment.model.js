@@ -12,7 +12,14 @@ const enrollmentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
       required: true
-    }
+    },
+    
+    status: {
+      type: String,
+      enum: ["in-progress", "completed"],
+      default: "in-progress"
+    },  
+    
   },
   { timestamps: true }
 );

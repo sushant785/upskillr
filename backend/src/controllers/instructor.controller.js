@@ -1,8 +1,10 @@
 import CourseModel from "../models/Course.model.js";
-import LessonModel from "../models/Lesson.model.js"
+import LessonModel from "../models/Lesson.model.js";
+import EnrollmentModel from "../models/Enrollment.model.js"
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3.js";
 import crypto from "crypto";
+import { inspect } from "util";
 
 const BUCKET = process.env.AWS_THUMBNAIL_BUCKET;
 
@@ -152,5 +154,80 @@ export const deleteCourse = async (req,res) => {
     }
     catch(err) {
         res.status(500).json({message:err.message})
+    }
+}
+
+
+export const getInstructorDashboard = async (req,res) => {
+    try {
+
+        const instructorId = req.user._id;
+
+        const totalCourses = await CourseModel.countDocuments({
+            instructor:instructorId,
+        })
+
+        const publishedCourses = await CourseModel.countDocuments({
+            instructor: instructorId,
+            isPublished:true
+        })
+
+        const draftCourses = await CourseModel.countDocuments({
+            instructor:instructorId,
+            isPublished:false
+        })
+
+        const courses = await CourseModel.find(
+            {instructor:instructorId},
+            "_id title isPublished  createdAt"
+        );
+
+        const courseIds = courses.map(course => course._id)
+
+
+        const totalEnrollments = await EnrollmentModel.countDocuments({
+            course: {$in:courseIds}
+        });
+
+        const activeLearners = await EnrollmentModel.countDocuments({
+            course: {$in:courseIds},
+            status: "in-progress"
+        })
+
+        const recentCourses = await CourseModel.find({
+            instructor:instructorId
+        })
+        .sort({createdAt:-1})
+        .limit(5)
+        .select("title isPublished createdAt price")
+
+        const recentEnrollments = await EnrollmentModel.find({
+            course: { $in: courseIds }
+        })
+        .sort({createdAt: -1})
+        .limit(5)
+        .populate("user", "name")
+        .populate("course", "title");
+
+
+
+        res.status(200).json({
+            totalCourses,
+            publishedCourses,
+            draftCourses,
+            totalEnrollments,
+            activeLearners,
+            recentCourses,
+            recentEnrollments: recentEnrollments.map(e => ({
+                learner: e.user.name,
+                course: e.course.title,
+                enrolledAt: e.createdAt
+            }))
+        });
+
+    }
+    catch(err) {
+        console.error("Instructor dashboard error:", err);
+        res.status(500).json({message:"Failed to load instructor dashboard"})
     }
 }
