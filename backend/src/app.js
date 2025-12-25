@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes.js"
 import uploadRoute from "./routes/upload.routes.js"
 import instructorRoute from "./routes/instructor.routes.js"
 import updateRouter from "./routes/update.routes.js";
+import learnerRoutes from "./routes/learner.routes.js";
 
 const app = express();
 dotenv.config();
@@ -19,5 +20,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoute);
 app.use("/api/instructor",instructorRoute);
 app.use('/api/update',updateRouter)
+app.use("/api/learner", learnerRoutes);
 
 export default app;
