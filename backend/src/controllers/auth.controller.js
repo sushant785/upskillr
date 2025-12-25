@@ -59,7 +59,7 @@ export const login = async (req, res) => {
     }
 
     const payload = {
-      id: user._id,
+      _id: user._id,
       role: user.role
     };
 
@@ -106,7 +106,7 @@ export const refreshToken = (req, res) => {
     );
 
     const newAccessToken = generateAccessToken({
-      id: decoded.id,
+      _id: decoded._id,
       role: decoded.role
     });
 
