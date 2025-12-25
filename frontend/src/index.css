@@ -1,1 +1,45 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* @theme {
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+} */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand Colors */
+  --brand-primary: #10b981;    /* Emerald 500 */
+  --brand-primary-hover: #34d399; /* Emerald 400 */
+  --brand-accent: #22d3ee;     /* Cyan 400 */
+  
+  /* Backgrounds */
+  --bg-main: #020617;          /* Slate 950 */
+  --bg-card: rgba(30, 41, 59, 0.4); /* Slate 800 with opacity */
+  --bg-input: rgba(15, 23, 42, 0.5); /* Slate 900 with opacity */
+  
+  /* Borders & Text */
+  --border-subtle: #1e293b;    /* Slate 800 */
+  --text-muted: #94a3b8;       /* Slate 400 */
+  --text-on-brand: #064e3b;    /* Emerald 950 (for buttons) */
+    
+    /* Typography */
+  --font-poppins: 'Poppins', sans-serif !important;;
+}
+
+* {
+  font-family: var(--font-poppins) !important;
+}
+  
+
+/* Apply globally */
+body {
+  font-family: var(--font-poppins);
+}
+
+
+
+/*  */
