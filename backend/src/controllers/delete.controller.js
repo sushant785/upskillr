@@ -4,7 +4,7 @@ import s3 from "../config/s3.js";
 
 export const deleteVideo = async (req, res) => {
   try {
-    const { videoId } = req.body;
+    const { videoId } = req.params;
 
     if (!videoId) {
       return res.status(400).json({
