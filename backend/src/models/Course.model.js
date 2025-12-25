@@ -28,6 +28,17 @@ const courseSchema = new mongoose.Schema(
       default: false
     },
 
+    thumbnail: {
+      type: String,
+      required: true
+    },
+
+    price: {
+      type: Number,
+      default: 0,
+      min:0
+    },
+
     averageRating: {
       type: Number,
       default: 0

@@ -16,6 +16,9 @@ const lessonSchema = new mongoose.Schema(
     videoUrl: {
       type: String
     },
+    attachment: {
+      type: String
+    },
 
     resourceUrl: {
       type: String
