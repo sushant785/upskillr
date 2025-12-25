@@ -1,6 +1,7 @@
 import Course from "../models/Course.model.js";
 import Enrollment from "../models/Enrollment.model.js";
 import Lesson from "../models/Lesson.model.js";
+import Progress from "../models/Progress.model.js"
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3 from "../config/s3.js";
@@ -104,4 +105,42 @@ export const getCourseLessons = async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
+};
+
+export const getLearnerDashboard = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const enrolledCourses = await Enrollment.countDocuments({ user: userId });
+    const completedCourses = await Progress.countDocuments({
+      user: userId,
+      isCompleted: true
+    });
+    const ongoingCourses = enrolledCourses - completedCourses;
+
+    const continueLearning = await Progress.find({
+      user: userId,
+      isCompleted: false
+    })
+      .sort({ updatedAt: -1 })
+      .limit(3)
+      .populate("course", "title thumbnail");
+
+    res.status(200).json({
+      role: "learner",
+      enrolledCourses,
+      ongoingCourses,
+      completedCourses,
+      continueLearning: continueLearning.map((p) => ({
+        courseId: p.course._id,
+        title: p.course.title,
+        thumbnail: p.course.thumbnail,
+        progressPercent: p.progressPercent
+      }))
+    });
+
+  } catch (error) {
+    console.error("Learner dashboard error:", error);
+    res.status(500).json({ message: "Failed to fetch learner dashboard" });
+  }
 };

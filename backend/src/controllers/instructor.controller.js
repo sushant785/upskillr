@@ -1,6 +1,7 @@
 import CourseModel from "../models/Course.model.js";
 import LessonModel from "../models/Lesson.model.js";
 import EnrollmentModel from "../models/Enrollment.model.js"
+import ProgressModel from "../models/Progress.model.js"
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3.js";
 import crypto from "crypto";
@@ -231,3 +232,68 @@ export const getInstructorDashboard = async (req,res) => {
         res.status(500).json({message:"Failed to load instructor dashboard"})
     }
 }
+
+export const getCourseEnrollments = async (req, res) => {
+    try {
+        const instructorId = req.user._id;
+        const { courseId } = req.params;
+
+        const course = await CourseModel.findOne({
+            _id: courseId,
+            instructor: instructorId
+        });
+
+        if (!course) {
+            return res.status(404).json({message: "Course not found or not authorized"});
+        }
+
+        const totalLessons = await LessonModel.countDocuments({
+            course: courseId
+        });
+
+        const enrollments = await EnrollmentModel.find({ course: courseId })
+        .populate("user", "name email")
+        .sort({ createdAt: -1 });
+
+        const progressRecords = await ProgressModel.find({ course: courseId });
+
+        const progressMap = {};
+        progressRecords.forEach(p => {
+            progressMap[p.user.toString()] = p.completedLessons.length;
+        });
+
+        const learners = enrollments.map(e => {
+            const completedLessons = progressMap[e.user._id.toString()] || 0;
+
+            let progressPercent = 0;
+
+            if (e.status === "completed") {
+                progressPercent = 100;
+            } else if (totalLessons > 0) {
+                progressPercent = Math.round(
+                (completedLessons / totalLessons) * 100
+                );
+            }
+
+            return {
+                learnerId: e.user._id,
+                name: e.user.name,
+                email: e.user.email,
+                completedLessons,
+                totalLessons,
+                progress: progressPercent,
+                status: e.status
+            };
+        });
+
+        res.status(200).json({
+            courseTitle: course.title,
+            totalLearners: learners.length,
+            learners
+        });
+
+    } catch (error) {
+        console.error("Get course enrollments error:", error);
+        res.status(500).json({message: "Failed to fetch course enrollments"});
+    }
+};

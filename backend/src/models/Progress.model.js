@@ -14,6 +14,16 @@ const progressSchema = new mongoose.Schema(
       required: true
     },
 
+    progressPercent: {
+      type: Number,
+      default: 0
+    },
+
+    isCompleted: {
+      type: Boolean,
+      default: false
+    },
+
     completedLessons: [
       {
         type: mongoose.Schema.Types.ObjectId,
