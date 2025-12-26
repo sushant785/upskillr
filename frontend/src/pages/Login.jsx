@@ -30,16 +30,23 @@ const UpskillrAuth = () => {
         });
 
         if (response.status === 200 || response.status === 201) {
-        alert(isLogin ? "Login Successful!" : "Registration Successful!");
-        // Store Access Token in memory or state, NOT localStorage if you want high security
-        const token = response.data.accessToken;
-        // Redirect user to dashboard
+          alert(isLogin ? "Login Successful!" : "Registration Successful!");
+          
+          localStorage.setItem(
+            'auth',
+            JSON.stringify({
+              token: response.data.accessToken,
+              user: response.data.user
+            })
+          );
 
-        const userRole = response.data.role || role;
-        if (userRole === 'learner') {
-            navigate('/learner-dashboard'); // 4. Navigate to your route
+          // 2️⃣ ROLE BASED REDIRECT
+          const userRole = response.data.user.role;
+
+          if (userRole === 'learner') {
+            navigate('/learner/dashboard');
           } else {
-            navigate('/instructor-dashboard'); 
+            navigate('/instructor/dashboard');
           }
         }
     } catch (err) {
