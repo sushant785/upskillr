@@ -20,7 +20,10 @@ export const getAllCourses = async (req, res) => {
         }
 
         const courses = await Course.find(query).populate("instructor", "name");
-        res.status(200).json(courses);
+        res.status(200).json({ 
+            count: courses.length,
+            courses: courses 
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -40,12 +43,22 @@ export const getMyEnrolledCourses = async (req, res) => {
             })
             .sort({ createdAt: -1 });
 
-       
-        const myCourses = enrollments.map(e => e.course);
+            const coursesWithProgress = await Promise.all(enrollments.map(async (enrollment) => {
+            const progressDoc = await Progress.findOne({ 
+                user: userId, 
+                course: enrollment.course?._id 
+            });
+
+            return {
+                ...enrollment._doc, 
+                progressPercent: progressDoc ? progressDoc.progressPercent : 0, 
+                status: progressDoc?.isCompleted ? 'completed' : 'in-progress'
+            };
+        }));
 
         res.status(200).json({
-            count: myCourses.length,
-            courses: myCourses
+            count: coursesWithProgress.length,
+            courses: coursesWithProgress
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
