@@ -1,6 +1,7 @@
 import Course from "../models/Course.model.js";
 import Enrollment from "../models/Enrollment.model.js";
 import Lesson from "../models/Lesson.model.js";
+import Progress from "../models/Progress.model.js"
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3 from "../config/s3.js";
@@ -54,15 +55,32 @@ export const getMyEnrolledCourses = async (req, res) => {
 
 export const enrollInCourse = async (req, res) => {
     try {
+        const userId = req.user._id; 
+        const courseId = req.body.courseId;
+
         const enrollment = await Enrollment.create({
-            user: req.user._id,
-            course: req.body.courseId
+            user: userId,
+            course: courseId,
+            status: "in-progress"
         });
+
+    await Progress.create({
+        user: userId,
+        course: courseId,
+        progressPercent: 0,
+        completedLessons: []
+        });
+
         res.status(201).json({ message: "Enrolled successfully", enrollment });
-    } catch (err) {
-        res.status(400).json({ message: "You are already enrolled or invalid course" });
+    }
+     catch (err) {
+        if (err.code === 11000) {
+            return res.status(400).json({ message: "You are already enrolled in this course" });
+        }
+        res.status(400).json({ message: "Error enrolling or invalid course", error: err.message });
     }
 };
+
 
 
 export const getCourseDetails = async (req, res) => {
@@ -104,4 +122,91 @@ export const getCourseLessons = async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
+};
+
+
+export const updateLessonProgress = async (req, res) => {
+  try {
+    const { courseId, lessonId } = req.body;
+    const userId = req.user._id;
+
+    
+    let progress = await Progress.findOne({ user: userId, course: courseId });
+
+    if (!progress) {
+      progress = await Progress.create({
+        user: userId,
+        course: courseId,
+        completedLessons: [],
+        progressPercent: 0
+      });
+    }
+
+    if (!progress.completedLessons.includes(lessonId)) {
+      progress.completedLessons.push(lessonId);
+      
+     
+      const totalLessons = await Lesson.countDocuments({ course: courseId });
+
+      if (totalLessons > 0) {
+        const completedCount = progress.completedLessons.length;
+        progress.progressPercent = Math.round((completedCount / totalLessons) * 100);
+      }
+
+      
+      if (progress.progressPercent === 100) {
+        progress.isCompleted = true;
+      }
+
+      await progress.save();
+    }
+
+    res.status(200).json({
+      message: "Progress updated successfully",
+      progressPercent: progress.progressPercent,
+      isCompleted: progress.isCompleted
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error updating progress", error: error.message });
+  }
+};
+
+
+
+export const getLearnerDashboard = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const enrolledCourses = await Enrollment.countDocuments({ user: userId });
+    const completedCourses = await Progress.countDocuments({
+      user: userId,
+      isCompleted: true
+    });
+    const ongoingCourses = enrolledCourses - completedCourses;
+
+    const continueLearning = await Progress.find({
+      user: userId,
+      isCompleted: false
+    })
+      .sort({ updatedAt: -1 })
+      .limit(3)
+      .populate("course", "title thumbnail");
+
+    res.status(200).json({
+      role: "learner",
+      enrolledCourses,
+      ongoingCourses,
+      completedCourses,
+      continueLearning: continueLearning.map((p) => ({
+        courseId: p.course._id,
+        title: p.course.title,
+        thumbnail: p.course.thumbnail,
+        progressPercent: p.progressPercent
+      }))
+    });
+
+  } catch (error) {
+    console.error("Learner dashboard error:", error);
+    res.status(500).json({ message: "Failed to fetch learner dashboard" });
+  }
 };

@@ -1,5 +1,5 @@
 import express from "express"
-import { createCourse,getMyCourses,updateCourse,togglePublishCourse,deleteCourse,getInstructorDashboard } from "../controllers/instructor.controller.js"
+import { createCourse,getMyCourses,updateCourse,togglePublishCourse,deleteCourse,getInstructorDashboard,getCourseEnrollments } from "../controllers/instructor.controller.js"
 import { isInstructor, protect } from "../middlewares/auth.middleware.js";
 import {uploadThumbnail} from "../middlewares/upload.middleware.js"
 
@@ -11,5 +11,6 @@ router.put("/courses/:id",protect,isInstructor,uploadThumbnail.single("thumbnail
 router.patch("/courses/:id/publish",protect,isInstructor,togglePublishCourse);
 router.delete("/courses/:id",protect,isInstructor,deleteCourse);
 router.get("/dashboard",protect,isInstructor,getInstructorDashboard);
+router.get("/courses/:courseId/enrollments",protect,isInstructor,getCourseEnrollments);
 
 export default router;
