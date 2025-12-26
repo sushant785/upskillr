@@ -1,6 +1,8 @@
 import Login from './pages/Login.jsx';
 import LearnerDashboard from './pages/Dashboard/LearnerDashboard.jsx';
 import Profile from './pages/Profile.jsx';
+import MyCourses from './pages/Dashboard/MyCourses.jsx'; //
+import BrowseCourses from './pages/Dashboard/BrowseCourses.jsx'; //
 
 import LearnerLayout from './components/LearnerLayout.jsx';
 import InstructorLayout from './components/InstructorLayout.jsx';
@@ -21,6 +23,8 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={['learner']} />}>
           <Route element={<LearnerLayout />}>
             <Route path="/learner/dashboard" element={<LearnerDashboard />} />
+            <Route path="/learner/browse" element={<BrowseCourses />} /> 
+            <Route path="/learner/my-courses" element={<MyCourses />} /> 
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>

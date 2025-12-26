@@ -14,7 +14,8 @@ const BrowseCourses = () => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
+        const authData = JSON.parse(localStorage.getItem('auth')); 
+        const token = authData?.token;
 
         if (!token) {
       console.error("No token found. Redirecting...");
@@ -25,7 +26,7 @@ const BrowseCourses = () => {
         const response = await axios.get('http://localhost:5000/api/learner/browse', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log("BROWSE DATA:", response.data);
+        
         setCourses(response.data.courses || []);
       } catch (err) {
         console.error("Error fetching courses:", err);

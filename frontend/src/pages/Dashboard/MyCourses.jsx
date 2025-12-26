@@ -12,7 +12,8 @@ const MyCourses = () => {
     const fetchMyCourses = async () => {
       try {
         // 1. Retrieve Token directly
-        const token = localStorage.getItem('token');
+        const authData = JSON.parse(localStorage.getItem('auth')); 
+        const token = authData?.token;
         
         if (!token) {
             // Handle case where user isn't logged in
@@ -26,7 +27,7 @@ const MyCourses = () => {
             Authorization: `Bearer ${token}`
           }
         });
-        console.log("DEBUG: My Enrollments ->", response.data);
+        
         setEnrollments(response.data.courses || []);
       } catch (err) {
         console.error("Error fetching my courses:", err);

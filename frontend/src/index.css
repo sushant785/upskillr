@@ -6,9 +6,9 @@
   --color-secondary: #8b5cf6;
 } */
 
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
 
 :root {
   /* Brand Colors */
