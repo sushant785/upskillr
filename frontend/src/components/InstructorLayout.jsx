@@ -1,17 +1,17 @@
 
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import InstructorSidebar from './sidebar/InstructorSidebar'
 import { Menu, Bell, BrainCircuit } from 'lucide-react';
 
-const DashboardLayout = () => {
+const InstructorLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); 
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-white font-['Poppins'] flex overflow-hidden">
       {/* Reusable Sidebar */}
-      <Sidebar 
+      <InstructorSidebar 
         isOpen={isSidebarOpen} 
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
       />
@@ -68,4 +68,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+export default InstructorLayout;
