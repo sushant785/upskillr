@@ -42,7 +42,12 @@ const courseSchema = new mongoose.Schema(
     averageRating: {
       type: Number,
       default: 0
-    }
+    },
+    
+    sections: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Section"
+    }],
   },
   { timestamps: true }
 );

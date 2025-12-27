@@ -2,6 +2,7 @@ import CourseModel from "../models/Course.model.js";
 import LessonModel from "../models/Lesson.model.js";
 import EnrollmentModel from "../models/Enrollment.model.js"
 import ProgressModel from "../models/Progress.model.js"
+import SectionModel from "../models/Section.model.js";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3.js";
 import crypto from "crypto";
@@ -148,6 +149,7 @@ export const deleteCourse = async (req,res) => {
         }
 
         await LessonModel.deleteMany({ course:course._id})
+        await SectionModel.deleteMany({ course: course._id });
 
         await course.deleteOne()
         res.status(200).json({message:"course and lessons deleted success"})
@@ -295,5 +297,47 @@ export const getCourseEnrollments = async (req, res) => {
     } catch (error) {
         console.error("Get course enrollments error:", error);
         res.status(500).json({message: "Failed to fetch course enrollments"});
+    }
+};
+
+export const getCourseDetails = async (req,res) => {
+    try {
+        const courseId = req.params.id;
+
+        const course = await CourseModel.findById(courseId)
+
+        if(!course) {
+            return res.status(404).json({message:"Course not found"})
+        }
+        
+        if (req.user && course.instructor.toString() !== req.user._id.toString()) {
+             return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        res.status(200).json({message:"Course details fetched success" , course})
+        
+    } catch(err) {
+        console.log(err.message)
+        res.status(500).json({message:"Error fetching course details"})
+    }
+}
+
+
+export const getCourseCurriculum = async (req, res) => {
+    try {
+        const { id } = req.params; 
+
+        const sections = await SectionModel.find({ course: id })
+            .sort({ order: 1 }) 
+            .populate({
+                path: "lessons",
+                options: { sort: { order: 1 } } // Sort lessons inside the module (Lesson 1, 2...)
+            });
+
+        res.status(200).json({ success: true, sections });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching curriculum" });
     }
 };

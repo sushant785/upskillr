@@ -3,6 +3,8 @@ import LearnerDashboard from './pages/Dashboard/LearnerDashboard.jsx';
 import Profile from './pages/Profile.jsx';
 import MyCourses from './pages/Dashboard/MyCourses.jsx'; //
 import BrowseCourses from './pages/Dashboard/BrowseCourses.jsx'; //
+import CreateCourse from './pages/Instructor/CreateCourse.jsx';
+import CourseBuilder from './pages/Instructor/CourseBuilder.jsx';
 
 import LearnerLayout from './components/LearnerLayout.jsx';
 import InstructorLayout from './components/InstructorLayout.jsx';
@@ -10,6 +12,7 @@ import InstructorLayout from './components/InstructorLayout.jsx';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
 
 function App() {
   return (
@@ -33,6 +36,9 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={['instructor']} />}>
           <Route element={<InstructorLayout />}>
             <Route path="/instructor/dashboard" element={<LearnerDashboard />} />
+            <Route path="/instructor/create-course" element={<CreateCourse />} />
+            <Route path="/instructor/course/:courseId/manage" element={<CourseBuilder />} />
+            <Route path="/instructor/courses" element={<InstructorCourses />} />
           </Route>
         </Route>
 
