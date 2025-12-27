@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../utils/api.js'; // Your new Axios instance
+import api from '../../utils/api.js';
 import { motion } from 'framer-motion';
 import { 
   Search, Edit3, Trash2, MoreVertical, 
@@ -18,7 +18,6 @@ const InstructorCourses = () => {
     const fetchCourses = async () => {
       try {
         const { data } = await api.get('/instructor/my-courses');
-        // Assuming backend returns: { success: true, courses: [...] }
         setCourses(data.courses);
       } catch (error) {
         console.error("Failed to fetch courses:", error);
@@ -30,7 +29,6 @@ const InstructorCourses = () => {
     fetchCourses();
   }, []);
 
-  // Filter logic
   const filteredCourses = courses.filter(course => 
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -51,7 +49,7 @@ const InstructorCourses = () => {
           <p className="text-slate-400">Manage your content and track performance.</p>
         </div>
         <button 
-          onClick={() => navigate('/instructor/create-course')} // Navigate to Create Tab
+          onClick={() => navigate('/instructor/create-course')}
           className="px-6 py-3 rounded-xl bg-emerald-500 text-emerald-950 font-bold text-sm hover:bg-emerald-400 transition-all flex items-center gap-2"
         >
           <Plus size={18} /> New Course

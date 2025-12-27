@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UploadCloud, 
-  IndianRupee, // Changed from DollarSign
+  IndianRupee,
   Layout, 
   Type, 
   FileText,
@@ -26,13 +26,11 @@ const CreateCourse = () => {
     thumbnail: null
   });
 
-  // Handle Text Inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle File Input
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -41,19 +39,17 @@ const CreateCourse = () => {
     }
   };
 
-  // Remove Selected Image
   const removeImage = () => {
     setFormData(prev => ({ ...prev, thumbnail: null }));
     setPreviewUrl(null);
   };
 
-  // Handle Submit
   const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
 
       try {
-        // 1. Prepare Data
+ 
         const data = new FormData();
         data.append('title', formData.title);
         data.append('description', formData.description);
@@ -63,18 +59,11 @@ const CreateCourse = () => {
           data.append('thumbnail', formData.thumbnail);
         }
 
-        // 2. API Call (Replace URL with your actual endpoint)
         const response = await api.post('/instructor/courses', data)
 
-        // 3. Handle Success & Redirect
-        // We check if 'course' exists in the response based on your JSON structure
         if (response.data && response.data.course) {
           const newCourseId = response.data.course._id;
-          
-          // Optional: Show a quick toast notification here
-          // toast.success("Course created! Redirecting...");
 
-          // REDIRECT to the Builder Page
           navigate(`/instructor/course/${newCourseId}/manage`);
         }
 
@@ -93,7 +82,7 @@ const CreateCourse = () => {
       <motion.div 
         initial={{ opacity: 0, y: -20 }} 
         animate={{ opacity: 1, y: 0 }} 
-        className="mb-12" // Increased bottom margin for better separation
+        className="mb-12" 
       >
         <h1 className="text-3xl md:text-5xl font-black tracking-tight uppercase mb-2">
           Create Course
@@ -105,14 +94,14 @@ const CreateCourse = () => {
 
       {/* --- MAIN FORM --- */}
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10"> {/* Increased gap from 8 to 10 */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10"> 
           
           {/* LEFT COLUMN: Course Details */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }} 
             animate={{ opacity: 1, x: 0 }} 
             transition={{ delay: 0.1 }}
-            className="lg:col-span-2 space-y-8" // Increased vertical space between elements
+            className="lg:col-span-2 space-y-8"
           >
             <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8 md:p-10 space-y-8 relative overflow-hidden backdrop-blur-sm">
               
@@ -152,7 +141,7 @@ const CreateCourse = () => {
               </InputGroup>
 
               {/* Category & Price Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> {/* Increased gap */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> 
                 
                 <InputGroup label="Category" icon={<Layout size={18} />}>
                   {/* Fixed Dropdown Styling */}
@@ -202,7 +191,7 @@ const CreateCourse = () => {
             initial={{ opacity: 0, x: 20 }} 
             animate={{ opacity: 1, x: 0 }} 
             transition={{ delay: 0.2 }}
-            className="space-y-8" // Increased spacing
+            className="space-y-8" 
           >
             
             {/* Thumbnail Upload Card */}
