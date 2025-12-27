@@ -5,6 +5,7 @@ import MyCourses from './pages/Dashboard/MyCourses.jsx'; //
 import BrowseCourses from './pages/Dashboard/BrowseCourses.jsx'; //
 import CreateCourse from './pages/Instructor/CreateCourse.jsx';
 import CourseBuilder from './pages/Instructor/CourseBuilder.jsx';
+import CoursePlayer from './pages/Dashboard/CoursePlayer.jsx'; //
 
 import LearnerLayout from './components/LearnerLayout.jsx';
 import InstructorLayout from './components/InstructorLayout.jsx';
@@ -24,6 +25,9 @@ function App() {
 
        
         <Route element={<ProtectedRoute allowedRoles={['learner']} />}>
+
+        <Route path="/learner/course/:courseId/learn" element={<CoursePlayer />} />
+
           <Route element={<LearnerLayout />}>
             <Route path="/learner/dashboard" element={<LearnerDashboard />} />
             <Route path="/learner/browse" element={<BrowseCourses />} /> 

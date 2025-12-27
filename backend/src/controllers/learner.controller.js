@@ -99,20 +99,54 @@ export const enrollInCourse = async (req, res) => {
     }
 };
 
-
 export const getCourseDetails = async (req, res) => {
     try {
-        const course = await Course.findById(req.params.courseId).populate("instructor", "name");
-        if (!course) return res.status(404).json({ message: "Course not found" });
-        
-        const isEnrolled = await Enrollment.findOne({ 
-            user: req.user._id, 
-            course: req.params.courseId 
-        });
+        const { courseId } = req.params;
+        const userId = req.user._id;
 
-        const lessons = await Lesson.find({ course: course._id }).select("title order").sort("order");
+        const course = await Course.findById(courseId)
+            .populate("instructor", "name")
+            .populate({
+                path: "sections",
+                options: { sort: { order: 1 } }, 
+                populate: {
+                    path: "lessons",
+                    options: { sort: { order: 1 } }, 
+                    select: "title videoUrl order resourceUrl attachment"
+                }
+            });
+
+        if (!course) return res.status(404).json({ message: "Course not found" });
+
+        for (let section of course.sections) {
+        for (let lesson of section.lessons) {
+        if (lesson.videoUrl) {
+          const command = new GetObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: lesson.videoUrl, 
+          });
+
+          
+          const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+          lesson.videoUrl = signedUrl; 
+        }
         
-        res.status(200).json({ course, lessons, isEnrolled: !!isEnrolled });
+        if (lesson.attachment) {
+         const attachmentCommand = new GetObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: lesson.attachment, 
+      });
+
+      
+      const signedAttachmentUrl = await getSignedUrl(s3, attachmentCommand, { expiresIn: 3600 });
+      lesson.attachment = signedAttachmentUrl; 
+    }
+    }
+    }
+
+        const isEnrolled = await Enrollment.findOne({ user: userId, course: courseId });
+
+        res.status(200).json({ course, isEnrolled: !!isEnrolled });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

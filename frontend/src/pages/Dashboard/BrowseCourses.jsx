@@ -36,18 +36,7 @@ const handleEnroll = async (courseId) => {
   }
 };
 
-  // const handleEnroll = async (courseId) => {
-  //   try {
-  //     const token = localStorage.getItem('token');
-  //     await axios.post('http://localhost:5000/api/learner/enroll', 
-  //       { courseId }, 
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-  //     alert("Enrolled successfully! Check your My Courses tab.");
-  //   } catch (err) {
-  //     alert(err.response?.data?.message || "Enrollment failed");
-  //   }
-  // };
+  
 
   // Filter logic for search and category chips
   const filteredCourses = courses.filter(course => {

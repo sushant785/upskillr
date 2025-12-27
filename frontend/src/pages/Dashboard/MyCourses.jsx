@@ -8,50 +8,18 @@ const MyCourses = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const fetchMyCourses = async () => {
-  //     try {
-  //       // 1. Retrieve Token directly
-  //       const authData = JSON.parse(localStorage.getItem('auth')); 
-  //       const token = authData?.token;
-        
-  //       if (!token) {
-  //           // Handle case where user isn't logged in
-  //           console.error("No token found");
-  //           return;
-  //       }
-
-  //       // 2. Make authenticated request directly
-  //       const response = await axios.get('http://localhost:5000/api/learner/my-courses', {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       });
-        
-  //       setEnrollments(response.data.courses || []);
-  //     } catch (err) {
-  //       console.error("Error fetching my courses:", err);
-  //       // Optional: redirect to login if 401 error occurs
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchMyCourses();
-  // }, []);
-
+  
 
  useEffect(() => {
   const fetchMyCourses = async () => {
-    setLoading(true); // Ensure loading state starts true
+    setLoading(true); 
     try {
-      // The interceptor automatically attaches the Bearer token
+      
       const response = await api.get('/learner/my-courses'); 
       
       setEnrollments(response.data.courses || []);
     } catch (err) {
       console.error("Error fetching my courses:", err);
-      // If api.js has a response interceptor, it will handle 401s automatically
     } finally {
       setLoading(false);
     }
@@ -63,9 +31,8 @@ const MyCourses = () => {
 
 
   const handleContinueBtn = (courseId) => {
-      // Future: navigate to the course player page
       console.log(`Continuing course: ${courseId}`);
-      // navigate(`/dashboard/course/${courseId}/learn`);
+      navigate(`/learner/course/${courseId}/learn`);
   }
 
   if (loading) {
