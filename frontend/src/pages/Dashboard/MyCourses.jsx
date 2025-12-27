@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { PlayCircle, CheckCircle, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,37 +8,59 @@ const MyCourses = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchMyCourses = async () => {
-      try {
-        // 1. Retrieve Token directly
-        const authData = JSON.parse(localStorage.getItem('auth')); 
-        const token = authData?.token;
+  // useEffect(() => {
+  //   const fetchMyCourses = async () => {
+  //     try {
+  //       // 1. Retrieve Token directly
+  //       const authData = JSON.parse(localStorage.getItem('auth')); 
+  //       const token = authData?.token;
         
-        if (!token) {
-            // Handle case where user isn't logged in
-            console.error("No token found");
-            return;
-        }
+  //       if (!token) {
+  //           // Handle case where user isn't logged in
+  //           console.error("No token found");
+  //           return;
+  //       }
 
-        // 2. Make authenticated request directly
-        const response = await axios.get('http://localhost:5000/api/learner/my-courses', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+  //       // 2. Make authenticated request directly
+  //       const response = await axios.get('http://localhost:5000/api/learner/my-courses', {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       });
         
-        setEnrollments(response.data.courses || []);
-      } catch (err) {
-        console.error("Error fetching my courses:", err);
-        // Optional: redirect to login if 401 error occurs
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       setEnrollments(response.data.courses || []);
+  //     } catch (err) {
+  //       console.error("Error fetching my courses:", err);
+  //       // Optional: redirect to login if 401 error occurs
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchMyCourses();
-  }, []);
+  //   fetchMyCourses();
+  // }, []);
+
+
+ useEffect(() => {
+  const fetchMyCourses = async () => {
+    setLoading(true); // Ensure loading state starts true
+    try {
+      // The interceptor automatically attaches the Bearer token
+      const response = await api.get('/learner/my-courses'); 
+      
+      setEnrollments(response.data.courses || []);
+    } catch (err) {
+      console.error("Error fetching my courses:", err);
+      // If api.js has a response interceptor, it will handle 401s automatically
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchMyCourses();
+ }, []);
+
+
 
   const handleContinueBtn = (courseId) => {
       // Future: navigate to the course player page
@@ -149,9 +171,9 @@ const MyCourses = () => {
           <PlayCircle size={64} className="text-[var(--text-muted)] mx-auto mb-6 opacity-50" />
           <h2 className="text-2xl font-bold text-white mb-2">No courses yet</h2>
           <p className="text-[var(--text-muted)] mb-8 max-w-md mx-auto">You haven't enrolled in any courses. Visit the browse page to start your journey.</p>
-          <a href="/dashboard/browse" className="px-8 py-3 bg-[var(--brand-primary)] text-[var(--text-on-brand)] rounded-xl font-bold hover:bg-[var(--brand-primary-hover)] transition-colors">
-            Browse Courses
-          </a>
+          <button onClick={() => navigate('/learner/browse')} className="px-8 py-3 bg-[var(--brand-primary)] text-[var(--text-on-brand)] rounded-xl font-bold hover:bg-[var(--brand-primary-hover)] transition-colors">
+             Browse Courses
+          </button>
         </div>
       )}
     </div>

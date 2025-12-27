@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { Search, Filter, Star, Clock, Users, PlayCircle } from 'lucide-react';
 
 const BrowseCourses = () => {
@@ -10,45 +10,44 @@ const BrowseCourses = () => {
 
   const categories = ['All', 'Development', 'Design', 'Business', 'Marketing', 'Data Science'];
 
+
   useEffect(() => {
-    const fetchCourses = async () => {
-      setLoading(true);
-      try {
-        const authData = JSON.parse(localStorage.getItem('auth')); 
-        const token = authData?.token;
-
-        if (!token) {
-      console.error("No token found. Redirecting...");
-      setLoading(false);
-      return; 
-    }
-        // Fetching from your browse route
-        const response = await axios.get('http://localhost:5000/api/learner/browse', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        setCourses(response.data.courses || []);
-      } catch (err) {
-        console.error("Error fetching courses:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourses();
-  }, []);
-
-  const handleEnroll = async (courseId) => {
+  const fetchCourses = async () => {
+    setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/learner/enroll', 
-        { courseId }, 
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Enrolled successfully! Check your My Courses tab.");
+      const response = await api.get('/learner/browse'); 
+      setCourses(response.data.courses || []);
     } catch (err) {
-      alert(err.response?.data?.message || "Enrollment failed");
+      console.error("Error fetching courses:", err);
+    } finally {
+      setLoading(false);
     }
   };
+  fetchCourses();
+}, []);
+
+
+const handleEnroll = async (courseId) => {
+  try {
+    await api.post('/learner/enroll', { courseId });
+    alert("Enrolled successfully! Check your My Courses tab.");
+  } catch (err) {
+    alert(err.response?.data?.message || "Enrollment failed");
+  }
+};
+
+  // const handleEnroll = async (courseId) => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     await axios.post('http://localhost:5000/api/learner/enroll', 
+  //       { courseId }, 
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+  //     alert("Enrolled successfully! Check your My Courses tab.");
+  //   } catch (err) {
+  //     alert(err.response?.data?.message || "Enrollment failed");
+  //   }
+  // };
 
   // Filter logic for search and category chips
   const filteredCourses = courses.filter(course => {
@@ -140,12 +139,9 @@ const BrowseCourses = () => {
          {course.price === 0 ? "FREE" : `₹${course.price}`}
        </span>
     </div>
-                  <button 
-                    onClick={() => handleEnroll(course._id)}
-                    className="bg-[var(--brand-primary)] text-[var(--text-on-brand)] px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[var(--brand-primary-hover)] transition-all active:scale-95 shadow-lg shadow-emerald-500/10"
-                  >
-                    Enroll Now
-                  </button>
+       <button onClick={() => handleEnroll(course._id)}
+          className="bg-[var(--brand-primary)] text-[var(--text-on-brand)] px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[var(--brand-primary-hover)] transition-all active:scale-95 shadow-lg shadow-emerald-500/10">
+            Enroll Now</button>
                 </div>
               </div>
             </div>

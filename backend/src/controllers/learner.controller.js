@@ -65,11 +65,19 @@ export const getMyEnrolledCourses = async (req, res) => {
     }
 };
 
-
 export const enrollInCourse = async (req, res) => {
     try {
         const userId = req.user._id; 
         const courseId = req.body.courseId;
+
+        const [existingEnrollment, existingProgress] = await Promise.all([
+            Enrollment.findOne({ user: userId, course: courseId }),
+            Progress.findOne({ user: userId, course: courseId })
+        ]);
+        
+        if (existingEnrollment || existingProgress) {
+            return res.status(400).json({ message: "You are already enrolled in this course"});
+        }
 
         const enrollment = await Enrollment.create({
             user: userId,
@@ -77,23 +85,19 @@ export const enrollInCourse = async (req, res) => {
             status: "in-progress"
         });
 
-    await Progress.create({
-        user: userId,
-        course: courseId,
-        progressPercent: 0,
-        completedLessons: []
+        await Progress.create({
+            user: userId,
+            course: courseId,
+            progressPercent: 0,
+            completedLessons: []
         });
 
         res.status(201).json({ message: "Enrolled successfully", enrollment });
-    }
-     catch (err) {
-        if (err.code === 11000) {
-            return res.status(400).json({ message: "You are already enrolled in this course" });
-        }
-        res.status(400).json({ message: "Error enrolling or invalid course", error: err.message });
+
+    } catch (err) {
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 };
-
 
 
 export const getCourseDetails = async (req, res) => {
