@@ -14,7 +14,11 @@ import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
+<<<<<<< HEAD
 import Progress from './pages/Progress.jsx';
+=======
+import Enrollments from './pages/Instructor/Enrollments.jsx';
+>>>>>>> b91bb5407e0e9240eed84ad5c1049e6b3c9d4b1c
 
 function App() {
   return (
@@ -46,6 +50,7 @@ function App() {
             <Route path="/instructor/create-course" element={<CreateCourse />} />
             <Route path="/instructor/course/:courseId/manage" element={<CourseBuilder />} />
             <Route path="/instructor/courses" element={<InstructorCourses />} />
+            <Route path="/instructor/enrollments" element={<Enrollments />}/>
           </Route>
         </Route>
 

@@ -13,7 +13,7 @@ router.patch("/courses/:id/publish",protect,isInstructor,togglePublishCourse);
 router.delete("/courses/:id",protect,isInstructor,deleteCourse);
 router.get("/courses/:id", protect, getCourseDetails);
 router.get("/dashboard",protect,isInstructor,getInstructorDashboard);
-router.get("/courses/:courseId/enrollments",protect,isInstructor,getCourseEnrollments);
+router.get("/enrollments",protect,isInstructor,getCourseEnrollments);
 router.get('/courses/:id/curriculum', protect, getCourseCurriculum);
 
 router.post('/courses/:courseId/sections', protect, isInstructor, createSection);

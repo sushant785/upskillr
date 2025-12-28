@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import confetti from 'canvas-confetti';
 import api from '../../utils/api';
 import { 
   ChevronLeft, 
@@ -20,6 +21,7 @@ const CoursePlayer = () => {
   const [loading, setLoading] = useState(true);
   const [expandedSections, setExpandedSections] = useState({});
   const [completedLessons, setCompletedLessons] = useState([]); 
+  const [showCelebration, setShowCelebration] = useState(false);
 
  
  useEffect(() => {
@@ -29,7 +31,12 @@ const CoursePlayer = () => {
       const response = await api.get(`/learner/course/${courseId}`);
       
       
-      const { course, completedLessons } = response.data;
+      const { course, completedLessons,progressPercent } = response.data;
+
+      if (progressPercent === 100) {
+       // triggerConfetti(); // Uncomment if you want it every time they open a finished course
+    }
+
       
       setCourse(course);
       setCompletedLessons(completedLessons || []); 
@@ -69,9 +76,23 @@ const toggleLessonStatus = async (lessonId) => {
   try {
     const response = await api.post('/learner/update-progress', { courseId, lessonId });
     setCompletedLessons(response.data.completedLessons);
+    if (response.data.progressPercent === 100) {
+      triggerConfetti();
+      setShowCelebration(true);
+    }
   } catch (err) {
     console.error("Error toggling progress:", err);
   }
+};
+
+
+const triggerConfetti = () => {
+  confetti({
+    particleCount: 150,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#10b981', '#34d399', '#31e6faff','#d2e146ff','#db2c7dff'] // Emerald themed
+  });
 };
 
 
@@ -253,8 +274,38 @@ const toggleLessonStatus = async (lessonId) => {
             })}
           </div>
         </aside>
-
       </div>
+
+      {/* --- Celebration Modal --- */}
+{showCelebration && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div className="bg-[#1e293b] border border-emerald-500/30 p-8 rounded-3xl max-w-md w-full text-center shadow-[0_0_50px_rgba(16,185,129,0.2)] animate-in fade-in zoom-in duration-300">
+      <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+        <CheckCircle size={48} className="text-emerald-400" />
+      </div>
+      
+      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Course Completed!</h2>
+      <p className="text-slate-400 mb-8 font-medium">
+        Incredible work! You've successfully mastered all the modules in <span className="text-emerald-400">"{course?.title}"</span>.
+      </p>
+
+      <div className="flex flex-col gap-3">
+        <button 
+          onClick={() => navigate('/learner/my-courses')}
+          className="w-full py-4 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+        >
+          View My Courses
+        </button>
+        <button 
+          onClick={() => setShowCelebration(false)}
+          className="w-full py-3 text-slate-500 hover:text-slate-300 font-bold transition-colors"
+        >
+          Keep Re-watching
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

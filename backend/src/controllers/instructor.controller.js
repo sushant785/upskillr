@@ -238,61 +238,64 @@ export const getInstructorDashboard = async (req,res) => {
 export const getCourseEnrollments = async (req, res) => {
     try {
         const instructorId = req.user._id;
-        const { courseId } = req.params;
 
-        const course = await CourseModel.findOne({
-            _id: courseId,
+        const courses = await CourseModel.find({
             instructor: instructorId
-        });
+        }).select('_id');
 
-        if (!course) {
-            return res.status(404).json({message: "Course not found or not authorized"});
+        const courseIds = courses.map(c => c._id) 
+
+        if(courseIds.length === 0) {
+            return res.status(200).json({learners:[]});
         }
 
-        const totalLessons = await LessonModel.countDocuments({
-            course: courseId
-        });
+        const [enrollments,progressRecord,lessonCounts] = await Promise.all([
+            EnrollmentModel.find({course : {$in:courseIds}})
+            .populate("user","name email")
+            .populate("course","title")
+            .sort({createdAt: -1}),
 
-        const enrollments = await EnrollmentModel.find({ course: courseId })
-        .populate("user", "name email")
-        .sort({ createdAt: -1 });
+            ProgressModel.find({ course: {$in:courseIds} }),
 
-        const progressRecords = await ProgressModel.find({ course: courseId });
+            LessonModel.aggregate([
+                { $match:{ course:{$in:courseIds}} },
+                { $group:{ _id:"$course", count: {$sum:1} } }
+            ])
+        ]);
+
+        const lessonCountMap = {};
+        lessonCounts.forEach(item => {
+            lessonCountMap[item._id.toString()] = item.count;
+        })
 
         const progressMap = {};
-        progressRecords.forEach(p => {
-            progressMap[p.user.toString()] = p.completedLessons.length;
-        });
+        progressRecord.forEach(p => {
+            const key = `${p.user.toString()}_${p.course.toString()}`
+            progressMap[key] = p;
+        })
 
         const learners = enrollments.map(e => {
-            const completedLessons = progressMap[e.user._id.toString()] || 0;
+            const userId = e.user._id.toString();
+            const courseId = e.course._id.toString();
 
-            let progressPercent = 0;
+            const progressRecord = progressMap[`${userId}_${courseId}`];
+            const totalLessons = lessonCountMap[courseId] || 0;
 
-            if (e.status === "completed") {
-                progressPercent = 100;
-            } else if (totalLessons > 0) {
-                progressPercent = Math.round(
-                (completedLessons / totalLessons) * 100
-                );
+            return{
+                _id:e._id,
+                name:e.user.name,
+                email:e.user.email,
+                courseName: e.course.title,
+                status:e.status,
+                enrolledAt:e.createdAt,
+
+                progressPercent:progressRecord? progressRecord.progressPercent:0,
+                completedLessons: progressRecord? progressRecord.completedLessons.length:0,
+                totalLessons:totalLessons
             }
+        })
 
-            return {
-                learnerId: e.user._id,
-                name: e.user.name,
-                email: e.user.email,
-                completedLessons,
-                totalLessons,
-                progress: progressPercent,
-                status: e.status
-            };
-        });
-
-        res.status(200).json({
-            courseTitle: course.title,
-            totalLearners: learners.length,
-            learners
-        });
+        res.status(200).json({learners})
 
     } catch (error) {
         console.error("Get course enrollments error:", error);
