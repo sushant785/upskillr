@@ -14,6 +14,7 @@ import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
+import Progress from './pages/Progress.jsx';
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
             <Route path="/learner/browse" element={<BrowseCourses />} /> 
             <Route path="/learner/my-courses" element={<MyCourses />} /> 
             <Route path="/profile" element={<Profile />} />
+            <Route path="/learner/progress" element={<Progress />} />
+            
           </Route>
         </Route>
 

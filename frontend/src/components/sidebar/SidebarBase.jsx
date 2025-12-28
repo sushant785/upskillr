@@ -70,10 +70,22 @@ const SidebarBase = ({ navItems, isOpen, toggleSidebar }) => {
               <span className="font-bold text-sm">Settings</span>
             </button>
 
-            <button className="flex items-center gap-3 w-full p-3 text-red-400 hover:bg-red-400/10 rounded-xl mt-2">
-              <LogOut size={20} />
+            {/* <button className="flex items-center gap-3 w-full p-3 text-red-400 hover:bg-red-400/10 rounded-xl mt-2">
+              
+              <LogOut
+              size={20}
+              className="transition-transform duration-500 hover:rotate-180"
+/>
               <span className="font-bold text-sm">Logout</span>
-            </button>
+            </button> */}
+            <button className="group flex items-center gap-3 w-full p-3 text-red-400 hover:bg-red-400/10 rounded-xl mt-2">
+            <LogOut
+              size={20}
+              className="transition-transform duration-500 group-hover:rotate-180"
+            />
+            <span className="font-bold text-sm">Logout</span>
+          </button>
+
           </div>
         </div>
       </aside>
