@@ -14,11 +14,8 @@ import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
-<<<<<<< HEAD
 import Progress from './pages/Progress.jsx';
-=======
 import Enrollments from './pages/Instructor/Enrollments.jsx';
->>>>>>> b91bb5407e0e9240eed84ad5c1049e6b3c9d4b1c
 
 function App() {
   return (
