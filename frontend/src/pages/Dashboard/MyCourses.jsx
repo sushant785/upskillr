@@ -60,7 +60,7 @@ const MyCourses = () => {
 
 
       {enrollments?.length > 0 ? (
-        /* Grid Layout adapted from inspiration image */
+        /* Grid Layout  */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {enrollments.map((item) => {
             const { course, progressPercent, status } = item;
@@ -90,7 +90,7 @@ const MyCourses = () => {
                   {course.title}
                 </h3>
                 
-                {/* Instructor - Optional if you have this data populated */}
+                {/* Instructor  */}
                 {course.instructor && (
                     <p className="text-sm text-[var(--text-muted)] mb-6">
                         By <span className="text-slate-300">{course.instructor.name}</span>
@@ -99,34 +99,37 @@ const MyCourses = () => {
 
                 <div className="mt-auto">
                     {/* Progress Bar Section */}
-                    <div className="flex justify-between text-sm mb-2 font-medium">
-                        <span className={status === 'completed' ? "text-[var(--brand-primary)]" : "text-white"}>
-                            {progressPercent || 0}% Completed
-                        </span>
-                        {status === 'completed' ? (
-                            <CheckCircle size={18} className="text-[var(--brand-primary)]" />
-                        ) : (
-                            <Clock size={18} className="text-[var(--text-muted)]" />
-                        )}
-                    </div>
-                    <div className="w-full bg-slate-700/50 h-2.5 rounded-full overflow-hidden mb-6">
-                        <div 
-                            className="h-full bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] transition-all duration-700 ease-out relative"
-                            style={{ width: `${progressPercent || 0}%` }}
-                        >
-                            {/* Glow effect at the end of the progress bar */}
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-[0_0_10px_var(--brand-primary)]"></div>
-                        </div>
-                    </div>
+              
+<div className="flex justify-between text-sm mb-2 font-medium">
+    <span className={item.progressPercent === 100 ? "text-emerald-400" : "text-white"}>
+        {item.progressPercent}% Completed
+    </span>
+    {item.progressPercent === 100 ? (
+        <CheckCircle size={18} className="text-emerald-400" />
+    ) : (
+        <Clock size={18} className="text-slate-500" />
+    )}
+</div>
 
-                    {/* Action Button */}
-                    <button 
-                        onClick={() => handleContinueBtn(course._id)}
-                        className="w-full py-3 bg-[var(--brand-primary)] text-[var(--text-on-brand)] rounded-xl font-bold hover:bg-[var(--brand-primary-hover)] hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all active:scale-95 flex items-center justify-center gap-2"
-                    >
-                        <PlayCircle size={18} fill="currentColor" />
-                        {progressPercent > 0 ? "Continue Learning" : "Start Course"}
-                    </button>
+{/* --- The Dynamic Progress Bar --- */}
+<div className="w-full bg-slate-700/50 h-2.5 rounded-full overflow-hidden mb-6">
+    <div 
+        className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700 ease-out relative"
+        style={{ width: `${item.progressPercent}%` }} 
+    >
+        
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-[0_0_10px_#10b981]"></div>
+    </div>
+</div>
+
+{/* --- Action Button --- */}
+<button 
+    onClick={() => handleContinueBtn(course._id)}
+    className="w-full py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all active:scale-95 flex items-center justify-center gap-2"
+>
+    <PlayCircle size={18} fill="currentColor" />
+    {item.progressPercent > 0 ? "Continue Learning" : "Start Course"}
+</button>
                 </div>
               </div>
             </div>

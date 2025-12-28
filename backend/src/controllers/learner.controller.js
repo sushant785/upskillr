@@ -30,11 +30,10 @@ export const getAllCourses = async (req, res) => {
 };
 
 
+
 export const getMyEnrolledCourses = async (req, res) => {
     try {
         const userId = req.user._id; 
-
-        
         const enrollments = await Enrollment.find({ user: userId })
             .populate({
                 path: 'course',
@@ -43,27 +42,37 @@ export const getMyEnrolledCourses = async (req, res) => {
             })
             .sort({ createdAt: -1 });
 
-            const coursesWithProgress = await Promise.all(enrollments.map(async (enrollment) => {
+        const coursesWithProgress = await Promise.all(enrollments.map(async (enrollment) => {
+            if (!enrollment.course) return null; 
+
             const progressDoc = await Progress.findOne({ 
                 user: userId, 
-                course: enrollment.course?._id 
+                course: enrollment.course._id 
             });
+
+            const percent = progressDoc ? progressDoc.progressPercent : 0;
 
             return {
                 ...enrollment._doc, 
-                progressPercent: progressDoc ? progressDoc.progressPercent : 0, 
-                status: progressDoc?.isCompleted ? 'completed' : 'in-progress'
+                progressPercent: percent,
+                status: percent === 100 ? 'completed' : 'in-progress'
             };
         }));
+        const finalCourses = coursesWithProgress.filter(c => c !== null);
 
         res.status(200).json({
-            count: coursesWithProgress.length,
-            courses: coursesWithProgress
+            count: finalCourses.length,
+            courses: finalCourses
         });
     } catch (err) {
+        console.error("Error fetching enrolled courses:", err);
         res.status(500).json({ message: err.message });
     }
 };
+
+
+
+
 
 export const enrollInCourse = async (req, res) => {
     try {
@@ -99,58 +108,52 @@ export const enrollInCourse = async (req, res) => {
     }
 };
 
+
 export const getCourseDetails = async (req, res) => {
-    try {
-        const { courseId } = req.params;
-        const userId = req.user._id;
+  try {
+    const { courseId } = req.params;
+    const userId = req.user._id;
 
-        const course = await Course.findById(courseId)
-            .populate("instructor", "name")
-            .populate({
-                path: "sections",
-                options: { sort: { order: 1 } }, 
-                populate: {
-                    path: "lessons",
-                    options: { sort: { order: 1 } }, 
-                    select: "title videoUrl order resourceUrl attachment"
-                }
-            });
-
-        if (!course) return res.status(404).json({ message: "Course not found" });
-
-        for (let section of course.sections) {
-        for (let lesson of section.lessons) {
-        if (lesson.videoUrl) {
-          const command = new GetObjectCommand({
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: lesson.videoUrl, 
-          });
-
-          
-          const signedUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
-          lesson.videoUrl = signedUrl; 
+    const course = await Course.findById(courseId)
+      .populate("instructor", "name")
+      .populate({
+        path: "sections",
+        options: { sort: { order: 1 } },
+        populate: {
+          path: "lessons",
+          options: { sort: { order: 1 } },
+          select: "title videoUrl order resourceUrl attachment"
         }
-        
-        if (lesson.attachment) {
-         const attachmentCommand = new GetObjectCommand({
-          Bucket: process.env.AWS_BUCKET_NAME,
-          Key: lesson.attachment, 
       });
 
-      
-      const signedAttachmentUrl = await getSignedUrl(s3, attachmentCommand, { expiresIn: 3600 });
-      lesson.attachment = signedAttachmentUrl; 
-    }
-    }
+    if (!course) return res.status(404).json({ message: "Course not found" });
+
+    const userProgress = await Progress.findOne({ user: userId, course: courseId });
+
+  
+    for (let section of course.sections) {
+      for (let lesson of section.lessons) {
+        if (lesson.videoUrl) {
+          const command = new GetObjectCommand({ Bucket: process.env.AWS_BUCKET_NAME, Key: lesson.videoUrl });
+          lesson.videoUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+        }
+        if (lesson.attachment) {
+          const attachCmd = new GetObjectCommand({ Bucket: process.env.AWS_BUCKET_NAME, Key: lesson.attachment });
+          lesson.attachment = await getSignedUrl(s3, attachCmd, { expiresIn: 3600 });
+        }
+      }
     }
 
-        const isEnrolled = await Enrollment.findOne({ user: userId, course: courseId });
-
-        res.status(200).json({ course, isEnrolled: !!isEnrolled });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+    res.status(200).json({ 
+      course, 
+      completedLessons: userProgress ? userProgress.completedLessons : [],
+      progressPercent: userProgress ? userProgress.progressPercent : 0 
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
+
 
 
 export const getCourseLessons = async (req, res) => {
@@ -176,52 +179,42 @@ export const getCourseLessons = async (req, res) => {
 };
 
 
+
 export const updateLessonProgress = async (req, res) => {
   try {
     const { courseId, lessonId } = req.body;
     const userId = req.user._id;
 
-    
     let progress = await Progress.findOne({ user: userId, course: courseId });
-
     if (!progress) {
-      progress = await Progress.create({
-        user: userId,
-        course: courseId,
-        completedLessons: [],
-        progressPercent: 0
-      });
+      progress = new Progress({ user: userId, course: courseId, completedLessons: [] });
     }
 
-    if (!progress.completedLessons.includes(lessonId)) {
+    
+    const index = progress.completedLessons.indexOf(lessonId);
+    if (index > -1) {
+      progress.completedLessons.splice(index, 1);
+    } else {
       progress.completedLessons.push(lessonId);
-      
-     
-      const totalLessons = await Lesson.countDocuments({ course: courseId });
-
-      if (totalLessons > 0) {
-        const completedCount = progress.completedLessons.length;
-        progress.progressPercent = Math.round((completedCount / totalLessons) * 100);
-      }
-
-      
-      if (progress.progressPercent === 100) {
-        progress.isCompleted = true;
-      }
-
-      await progress.save();
     }
 
-    res.status(200).json({
-      message: "Progress updated successfully",
-      progressPercent: progress.progressPercent,
-      isCompleted: progress.isCompleted
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error updating progress", error: error.message });
+    
+    const lessonsCount = await Lesson.countDocuments({ course: courseId });
+    progress.progressPercent = lessonsCount > 0 ? Math.round((progress.completedLessons.length / lessonsCount) * 100) : 0;
+
+    await progress.save();
+
+    
+    await Enrollment.findOneAndUpdate(
+      { user: userId, course: courseId },
+      { status: progress.progressPercent === 100 ? "completed" : "in-progress" }
+    );
+
+    res.status(200).json({ completedLessons: progress.completedLessons, progressPercent: progress.progressPercent });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
-
 
 
 export const getLearnerDashboard = async (req, res) => {

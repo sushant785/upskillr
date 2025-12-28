@@ -19,33 +19,60 @@ const CoursePlayer = () => {
   const [currentLesson, setCurrentLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedSections, setExpandedSections] = useState({});
+  const [completedLessons, setCompletedLessons] = useState([]); 
 
-  useEffect(() => {
-    const fetchCourseContent = async () => {
-      try {
-        setLoading(true);
-       
-        const response = await api.get(`/learner/course/${courseId}`);
-        const courseData = response.data.course;
-        
-        setCourse(courseData);
+ 
+ useEffect(() => {
+  const fetchCourseContent = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/learner/course/${courseId}`);
+      
+      
+      const { course, completedLessons } = response.data;
+      
+      setCourse(course);
+      setCompletedLessons(completedLessons || []); 
 
-        if (courseData.sections?.length > 0) {
-          const firstSection = courseData.sections[0];
-          if (firstSection.lessons?.length > 0) {
-            setCurrentLesson(firstSection.lessons[0]);
-            setExpandedSections({ [firstSection._id]: true });
-          }
+      if (course.sections?.length > 0) {
+        const firstSection = course.sections[0];
+        if (firstSection.lessons?.length > 0) {
+          setCurrentLesson(firstSection.lessons[0]);
+          setExpandedSections({ [firstSection._id]: true });
         }
-      } catch (err) {
-        console.error("Failed to load course content:", err);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error("Failed to load course content:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchCourseContent();
-  }, [courseId]);
+  fetchCourseContent();
+}, [courseId]);
+
+
+const playNextLesson = () => {
+  if (!course || !currentLesson) return;
+  const allLessons = course.sections.flatMap(section => section.lessons);
+  const currentIndex = allLessons.findIndex(l => l._id === currentLesson._id);
+
+  if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
+    const nextLesson = allLessons[currentIndex + 1];
+    setCurrentLesson(nextLesson);
+    setExpandedSections(prev => ({ ...prev, [nextLesson.section]: true }));
+  }
+};
+
+
+const toggleLessonStatus = async (lessonId) => {
+  try {
+    const response = await api.post('/learner/update-progress', { courseId, lessonId });
+    setCompletedLessons(response.data.completedLessons);
+  } catch (err) {
+    console.error("Error toggling progress:", err);
+  }
+};
 
 
   const toggleSection = (sectionId) => {
@@ -85,16 +112,22 @@ const CoursePlayer = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-6">
-          <div className="text-right">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Your Progress</p>
-            <div className="flex items-center gap-3">
-              <div className="w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500" style={{ width: '0%' }}></div>
-              </div>
-              <span className="text-xs font-bold text-white">0%</span>
+  <div className="text-right">
+    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Your Progress</p>
+    {(() => {
+        const totalLessons = course?.sections?.reduce((acc, s) => acc + (s.lessons?.length || 0), 0) || 0;
+        const percent = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${percent}%` }}></div>
             </div>
+            <span className="text-xs font-bold text-white">{percent}%</span>
           </div>
-        </div>
+        );
+    })()}
+  </div>
+</div>
       </nav>
 
       <div className="flex flex-grow overflow-hidden">
@@ -103,28 +136,41 @@ const CoursePlayer = () => {
         <main className="flex-grow overflow-y-auto bg-black flex flex-col">
           <div className="aspect-video bg-black w-full relative shadow-2xl">
             {currentLesson?.videoUrl ? (
-              <video 
-                key={currentLesson._id}
-                src={currentLesson.videoUrl} 
-                controls
-                controlsList="nodownload"
-                className="w-full h-full"
-                autoPlay
-              />
-            ) : (
+             <video 
+  key={currentLesson._id}
+  src={currentLesson.videoUrl} 
+  controls
+  className="w-full h-full"
+  onEnded={playNextLesson} 
+/>
+      ) : (
               <div className="absolute inset-0 flex items-center justify-center text-slate-600 bg-slate-900">
                 <PlayCircle size={64} className="opacity-20 animate-pulse" />
               </div>
             )}
           </div>
 
-          <div className="p-8 max-w-4xl">
-            <div className="flex items-center gap-3 mb-4">
-               <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-1 rounded uppercase tracking-tighter border border-emerald-500/20">
-                 Currently Playing
-               </span>
-            </div>
-            <h2 className="text-3xl font-black text-white mb-4 tracking-tight">{currentLesson?.title}</h2>
+         <div className="p-8 max-w-4xl">
+  
+  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <div className="flex flex-col gap-2">
+      <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-1 rounded uppercase tracking-tighter border border-emerald-500/20 w-fit">
+        Currently Playing
+      </span>
+      <h2 className="text-3xl font-black text-white tracking-tight">
+        {currentLesson?.title}
+      </h2>
+    </div>
+
+    
+    <button 
+      onClick={() => toggleLessonStatus(currentLesson?._id)}
+      className="flex items-center gap-2 px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-black uppercase hover:bg-emerald-500 hover:text-white transition-all duration-300"
+    >
+      <CheckCircle size={18} />
+      {completedLessons.includes(currentLesson?._id) ? "Marked as Done" : "Mark as Completed"}
+    </button>
+  </div>
             <p className="text-slate-400 leading-relaxed text-sm font-medium border-l-2 border-slate-800 pl-6 py-2">
               {course?.description}
             </p>
@@ -177,28 +223,28 @@ const CoursePlayer = () => {
                   {isExpanded && (
                     <div className="bg-[#1e293b]">
                       {section.lessons?.map((lesson, lIndex) => (
-                        <button 
-                          key={lesson._id}
-                          onClick={() => setCurrentLesson(lesson)}
-                          className={`w-full p-4 pl-8 flex items-start gap-4 hover:bg-slate-700/30 transition-all border-b border-slate-800/30 group ${
-                            currentLesson?._id === lesson._id ? 'bg-emerald-500/10 border-l-4 border-l-emerald-500' : ''
-                          }`}
-                        >
-                          <div className="mt-1 shrink-0">
-                            {currentLesson?._id === lesson._id ? (
-                                <PlayCircle size={16} className="text-emerald-400 fill-emerald-400/20" />
-                            ) : (
-                                <PlayCircle size={16} className="text-slate-600 group-hover:text-slate-400" />
-                            )}
-                          </div>
-                          <div className="text-left">
-                            <p className={`text-xs font-bold leading-relaxed ${
-                              currentLesson?._id === lesson._id ? 'text-emerald-400' : 'text-slate-300'
-                            }`}>
-                              {lesson.title}
-                            </p>
-                          </div>
-                        </button>
+                        <div 
+        key={lesson._id} 
+        className={`flex items-center gap-4 p-4 pl-8 border-b border-slate-800/30 group ${
+          currentLesson?._id === lesson._id ? 'bg-emerald-500/10 border-l-4 border-l-emerald-500' : ''
+        }`}
+      >
+        {/* Checkbox Toggle */}
+        <input 
+          type="checkbox"
+          checked={completedLessons.includes(lesson._id)}
+          onChange={() => toggleLessonStatus(lesson._id)}
+          className="w-4 h-4 rounded border-slate-600 bg-slate-800 text-emerald-500 focus:ring-emerald-500 cursor-pointer accent-emerald-500"
+        />
+        
+        <button onClick={() => setCurrentLesson(lesson)} className="flex-grow text-left">
+          <p className={`text-xs font-bold leading-relaxed ${
+            currentLesson?._id === lesson._id ? 'text-emerald-400' : 'text-slate-300'
+          }`}>
+            {lesson.title}
+          </p>
+        </button>
+      </div>
                       ))}
                     </div>
                   )}
