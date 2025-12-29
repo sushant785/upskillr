@@ -7,6 +7,7 @@ import uploadRoute from "./routes/upload.routes.js"
 import instructorRoute from "./routes/instructor.routes.js"
 import updateRouter from "./routes/update.routes.js";
 import learnerRoutes from "./routes/learner.routes.js";
+import reviewRouter from './routes/reviews.routes.js'
 
 const app = express();
 dotenv.config();
@@ -28,5 +29,6 @@ app.use("/api/upload", uploadRoute);
 app.use("/api/instructor",instructorRoute);
 app.use('/api/update',updateRouter)
 app.use("/api/learner", learnerRoutes);
+app.use('/api/review',reviewRouter)
 
 export default app;
