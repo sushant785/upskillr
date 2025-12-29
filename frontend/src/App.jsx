@@ -6,6 +6,7 @@ import BrowseCourses from './pages/Dashboard/BrowseCourses.jsx'; //
 import CreateCourse from './pages/Instructor/CreateCourse.jsx';
 import CourseBuilder from './pages/Instructor/CourseBuilder.jsx';
 import CoursePlayer from './pages/Dashboard/CoursePlayer.jsx'; //
+import CourseReview from './pages/Dashboard/CourseReview.jsx'; 
 
 import LearnerLayout from './components/LearnerLayout.jsx';
 import InstructorLayout from './components/InstructorLayout.jsx';
@@ -36,6 +37,7 @@ function App() {
             <Route path="/learner/my-courses" element={<MyCourses />} /> 
             <Route path="/profile" element={<Profile />} />
             <Route path="/learner/progress" element={<Progress />} />
+            <Route path="/learner/course/:courseId/review" element={<CourseReview />} />
             
           </Route>
         </Route>

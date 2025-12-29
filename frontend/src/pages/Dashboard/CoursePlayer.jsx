@@ -9,7 +9,8 @@ import {
   FileText, 
   ChevronDown, 
   ChevronUp,
-  ExternalLink 
+  ExternalLink,
+  Star // <--- 1. IMPORT ADDED
 } from 'lucide-react';
 
 const CoursePlayer = () => {
@@ -23,77 +24,73 @@ const CoursePlayer = () => {
   const [completedLessons, setCompletedLessons] = useState([]); 
   const [showCelebration, setShowCelebration] = useState(false);
 
- 
- useEffect(() => {
-  const fetchCourseContent = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/learner/course/${courseId}`);
-      
-      
-      const { course, completedLessons,progressPercent } = response.data;
+  useEffect(() => {
+    const fetchCourseContent = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(`/learner/course/${courseId}`);
+        const { course, completedLessons, progressPercent } = response.data;
 
-      if (progressPercent === 100) {
-       // triggerConfetti(); // Uncomment if you want it every time they open a finished course
-    }
-
-      
-      setCourse(course);
-      setCompletedLessons(completedLessons || []); 
-
-      if (course.sections?.length > 0) {
-        const firstSection = course.sections[0];
-        if (firstSection.lessons?.length > 0) {
-          setCurrentLesson(firstSection.lessons[0]);
-          setExpandedSections({ [firstSection._id]: true });
+        if (progressPercent === 100) {
+           // triggerConfetti(); 
         }
+        
+        setCourse(course);
+        setCompletedLessons(completedLessons || []); 
+
+        if (course.sections?.length > 0) {
+          const firstSection = course.sections[0];
+          if (firstSection.lessons?.length > 0) {
+            setCurrentLesson(firstSection.lessons[0]);
+            setExpandedSections({ [firstSection._id]: true });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load course content:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Failed to load course content:", err);
-    } finally {
-      setLoading(false);
+    };
+
+    fetchCourseContent();
+  }, [courseId]);
+
+
+  const playNextLesson = () => {
+    if (!course || !currentLesson) return;
+    const allLessons = course.sections.flatMap(section => section.lessons);
+    const currentIndex = allLessons.findIndex(l => l._id === currentLesson._id);
+
+    if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
+      const nextLesson = allLessons[currentIndex + 1];
+      setCurrentLesson(nextLesson);
+      setExpandedSections(prev => ({ ...prev, [nextLesson.section]: true }));
     }
   };
 
-  fetchCourseContent();
-}, [courseId]);
 
-
-const playNextLesson = () => {
-  if (!course || !currentLesson) return;
-  const allLessons = course.sections.flatMap(section => section.lessons);
-  const currentIndex = allLessons.findIndex(l => l._id === currentLesson._id);
-
-  if (currentIndex !== -1 && currentIndex < allLessons.length - 1) {
-    const nextLesson = allLessons[currentIndex + 1];
-    setCurrentLesson(nextLesson);
-    setExpandedSections(prev => ({ ...prev, [nextLesson.section]: true }));
-  }
-};
-
-
-const toggleLessonStatus = async (lessonId) => {
-  try {
-    const response = await api.post('/learner/update-progress', { courseId, lessonId });
-    setCompletedLessons(response.data.completedLessons);
-    if (response.data.progressPercent === 100) {
-      triggerConfetti();
-      setShowCelebration(true);
+  const toggleLessonStatus = async (lessonId) => {
+    try {
+      const response = await api.post('/learner/update-progress', { courseId, lessonId });
+      setCompletedLessons(response.data.completedLessons);
+      if (response.data.progressPercent === 100) {
+        triggerConfetti();
+        setShowCelebration(true);
+      }
+    } catch (err) {
+      console.error("Error toggling progress:", err);
     }
-  } catch (err) {
-    console.error("Error toggling progress:", err);
-  }
-};
+  };
 
 
-const triggerConfetti = () => {
-  confetti({
-    particleCount: 150,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: ['#10b981', '#34d399', '#31e6faff','#d2e146ff','#db2c7dff'] // Emerald themed
-  });
-};
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#10b981', '#34d399', '#31e6faff','#d2e146ff','#db2c7dff'] 
+    });
+  };
 
 
   const toggleSection = (sectionId) => {
@@ -133,22 +130,33 @@ const triggerConfetti = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-6">
-  <div className="text-right">
-    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Your Progress</p>
-    {(() => {
-        const totalLessons = course?.sections?.reduce((acc, s) => acc + (s.lessons?.length || 0), 0) || 0;
-        const percent = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${percent}%` }}></div>
-            </div>
-            <span className="text-xs font-bold text-white">{percent}%</span>
+          
+          {/* --- 2. NEW REVIEW BUTTON --- */}
+          <button 
+            onClick={() => navigate(`/learner/course/${courseId}/review`)}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all border border-slate-700 group"
+          >
+            <Star size={16} className="text-yellow-500 group-hover:fill-yellow-500 transition-colors duration-300" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Rate Course</span>
+          </button>
+          {/* --------------------------- */}
+
+          <div className="text-right">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Your Progress</p>
+            {(() => {
+                const totalLessons = course?.sections?.reduce((acc, s) => acc + (s.lessons?.length || 0), 0) || 0;
+                const percent = totalLessons > 0 ? Math.round((completedLessons.length / totalLessons) * 100) : 0;
+                return (
+                  <div className="flex items-center gap-3">
+                    <div className="w-32 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${percent}%` }}></div>
+                    </div>
+                    <span className="text-xs font-bold text-white">{percent}%</span>
+                  </div>
+                );
+            })()}
           </div>
-        );
-    })()}
-  </div>
-</div>
+        </div>
       </nav>
 
       <div className="flex flex-grow overflow-hidden">
@@ -158,13 +166,13 @@ const triggerConfetti = () => {
           <div className="aspect-video bg-black w-full relative shadow-2xl">
             {currentLesson?.videoUrl ? (
              <video 
-  key={currentLesson._id}
-  src={currentLesson.videoUrl} 
-  controls
-  className="w-full h-full"
-  onEnded={playNextLesson} 
-/>
-      ) : (
+                key={currentLesson._id}
+                src={currentLesson.videoUrl} 
+                controls
+                className="w-full h-full"
+                onEnded={playNextLesson} 
+              />
+            ) : (
               <div className="absolute inset-0 flex items-center justify-center text-slate-600 bg-slate-900">
                 <PlayCircle size={64} className="opacity-20 animate-pulse" />
               </div>
@@ -173,25 +181,24 @@ const triggerConfetti = () => {
 
          <div className="p-8 max-w-4xl">
   
-  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-    <div className="flex flex-col gap-2">
-      <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-1 rounded uppercase tracking-tighter border border-emerald-500/20 w-fit">
-        Currently Playing
-      </span>
-      <h2 className="text-3xl font-black text-white tracking-tight">
-        {currentLesson?.title}
-      </h2>
-    </div>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col gap-2">
+              <span className="bg-emerald-500/10 text-emerald-400 text-[10px] font-black px-2 py-1 rounded uppercase tracking-tighter border border-emerald-500/20 w-fit">
+                Currently Playing
+              </span>
+              <h2 className="text-3xl font-black text-white tracking-tight">
+                {currentLesson?.title}
+              </h2>
+            </div>
 
-    
-    <button 
-      onClick={() => toggleLessonStatus(currentLesson?._id)}
-      className="flex items-center gap-2 px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-black uppercase hover:bg-emerald-500 hover:text-white transition-all duration-300"
-    >
-      <CheckCircle size={18} />
-      {completedLessons.includes(currentLesson?._id) ? "Marked as Done" : "Mark as Completed"}
-    </button>
-  </div>
+            <button 
+              onClick={() => toggleLessonStatus(currentLesson?._id)}
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-black uppercase hover:bg-emerald-500 hover:text-white transition-all duration-300"
+            >
+              <CheckCircle size={18} />
+              {completedLessons.includes(currentLesson?._id) ? "Marked as Done" : "Mark as Completed"}
+            </button>
+          </div>
             <p className="text-slate-400 leading-relaxed text-sm font-medium border-l-2 border-slate-800 pl-6 py-2">
               {course?.description}
             </p>
@@ -277,35 +284,35 @@ const triggerConfetti = () => {
       </div>
 
       {/* --- Celebration Modal --- */}
-{showCelebration && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div className="bg-[#1e293b] border border-emerald-500/30 p-8 rounded-3xl max-w-md w-full text-center shadow-[0_0_50px_rgba(16,185,129,0.2)] animate-in fade-in zoom-in duration-300">
-      <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-        <CheckCircle size={48} className="text-emerald-400" />
-      </div>
-      
-      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Course Completed!</h2>
-      <p className="text-slate-400 mb-8 font-medium">
-        Incredible work! You've successfully mastered all the modules in <span className="text-emerald-400">"{course?.title}"</span>.
-      </p>
+      {showCelebration && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#1e293b] border border-emerald-500/30 p-8 rounded-3xl max-w-md w-full text-center shadow-[0_0_50px_rgba(16,185,129,0.2)] animate-in fade-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle size={48} className="text-emerald-400" />
+            </div>
+            
+            <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Course Completed!</h2>
+            <p className="text-slate-400 mb-8 font-medium">
+              Incredible work! You've successfully mastered all the modules in <span className="text-emerald-400">"{course?.title}"</span>.
+            </p>
 
-      <div className="flex flex-col gap-3">
-        <button 
-          onClick={() => navigate('/learner/my-courses')}
-          className="w-full py-4 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
-        >
-          View My Courses
-        </button>
-        <button 
-          onClick={() => setShowCelebration(false)}
-          className="w-full py-3 text-slate-500 hover:text-slate-300 font-bold transition-colors"
-        >
-          Keep Re-watching
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => navigate('/learner/my-courses')}
+                className="w-full py-4 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+              >
+                View My Courses
+              </button>
+              <button 
+                onClick={() => setShowCelebration(false)}
+                className="w-full py-3 text-slate-500 hover:text-slate-300 font-bold transition-colors"
+              >
+                Keep Re-watching
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
