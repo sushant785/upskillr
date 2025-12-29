@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Lock, GraduationCap, Presentation, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const UpskillrAuth = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [role, setRole] = useState('learner');
@@ -11,6 +12,7 @@ const UpskillrAuth = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const navigate = useNavigate();
 
     // Inside your UpskillrAuth component:
     const handleSubmit = async (e) => {
@@ -28,10 +30,24 @@ const UpskillrAuth = () => {
         });
 
         if (response.status === 200 || response.status === 201) {
-        alert(isLogin ? "Login Successful!" : "Registration Successful!");
-        // Store Access Token in memory or state, NOT localStorage if you want high security
-        const token = response.data.accessToken;
-        // Redirect user to dashboard
+          alert(isLogin ? "Login Successful!" : "Registration Successful!");
+          
+          localStorage.setItem(
+            'auth',
+            JSON.stringify({
+              token: response.data.accessToken,
+              user: response.data.user
+            })
+          );
+
+          // 2️⃣ ROLE BASED REDIRECT
+          const userRole = response.data.user.role;
+
+          if (userRole === 'learner') {
+            navigate('/learner/dashboard');
+          } else {
+            navigate('/instructor/dashboard');
+          }
         }
     } catch (err) {
         alert(err.response?.data?.message || "Authentication failed");
@@ -200,21 +216,7 @@ const RoleOption = ({ selected, onClick, icon, title }) => (
   </button>
 );
 
-// const InputField = ({ label, icon, placeholder, type = "text" }) => (
-//   <div className="space-y-1.5 md:space-y-2 text-left">
-//     <label className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-black text-[var(--text-muted)] ml-1">{label}</label>
-//     <div className="relative group">
-//       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[var(--brand-primary)] transition-colors">
-//         {icon}
-//       </div>
-//       <input 
-//         type={type} 
-//         placeholder={placeholder}
-//         className="w-full pl-11 md:pl-12 pr-4 py-3 md:py-4 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl text-xs md:text-sm text-white focus:outline-none focus:border-[var(--brand-primary)]/50 focus:bg-slate-800 transition-all placeholder:text-slate-600 font-medium"
-//       />
-//     </div>
-//   </div>
-// );
+
 
 const InputField = ({ label, icon, placeholder, type = "text", value, onChange }) => (
   <div className="space-y-1.5 md:space-y-2 text-left">

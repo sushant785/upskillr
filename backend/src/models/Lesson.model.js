@@ -8,6 +8,12 @@ const lessonSchema = new mongoose.Schema(
       required: true
     },
 
+    section: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Section",
+      required: true
+    },
+
     title: {
       type: String,
       required: true

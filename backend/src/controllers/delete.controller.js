@@ -1,5 +1,6 @@
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import Lesson from "../models/Lesson.model.js";
+import Section from "../models/Section.model.js"
 import s3 from "../config/s3.js";
 
 export const deleteVideo = async (req, res) => {
@@ -27,6 +28,12 @@ export const deleteVideo = async (req, res) => {
     });
 
     await s3.send(delCommand);
+
+    if (lesson.section) {
+        await Section.findByIdAndUpdate(lesson.section, {
+            $pull: { lessons: videoId }
+        });
+    }
 
     const result = await Lesson.deleteOne({ _id: videoId });
 
