@@ -17,6 +17,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
 import Progress from './pages/Progress.jsx';
 import Enrollments from './pages/Instructor/Enrollments.jsx';
+import CourseDetail from './pages/Dashboard/CourseDetail.jsx'; //
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={['learner']} />}>
 
         <Route path="/learner/course/:courseId/learn" element={<CoursePlayer />} />
+        <Route path="/learner/course/:courseId" element={<CourseDetail />} />
 
           <Route element={<LearnerLayout />}>
             <Route path="/learner/dashboard" element={<LearnerDashboard />} />
