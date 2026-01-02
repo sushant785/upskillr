@@ -3,10 +3,12 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import InstructorSidebar from './sidebar/InstructorSidebar'
 import { Menu, Bell, BrainCircuit } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const InstructorLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); 
+  const {auth} = useAuth();
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-white font-['Poppins'] flex overflow-hidden">
@@ -51,7 +53,9 @@ const InstructorLayout = () => {
             
             <div className="flex items-center gap-3 pl-3 md:pl-6 border-l border-white/10">
               <div className="text-right hidden sm:block">
-                <p className="text-xs font-bold text-white">Alex Johnson</p>
+                <p className="text-xs font-black text-[var(--text-main)] uppercase tracking-tight">
+                  {auth.user.name || "Instructor"}
+                </p>
                 <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Pro Plan</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 border-2 border-slate-800 shadow-lg shadow-emerald-500/10" />

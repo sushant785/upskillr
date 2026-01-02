@@ -86,7 +86,7 @@ function App() {
             <Route path="/learner/dashboard" element={<LearnerDashboard />} />
             <Route path="/learner/browse" element={<BrowseCourses />} /> 
             <Route path="/learner/my-courses" element={<MyCourses />} /> 
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/learner/profile" element={<Profile />} />
             <Route path="/learner/progress" element={<Progress />} />
             <Route path="/learner/course/:courseId/review" element={<CourseReview />} />
             
@@ -101,6 +101,7 @@ function App() {
             <Route path="/instructor/course/:courseId/manage" element={<CourseBuilder />} />
             <Route path="/instructor/courses" element={<InstructorCourses />} />
             <Route path="/instructor/enrollments" element={<Enrollments />}/>
+            <Route path="/instructor/profile" element={<Profile />} />
           </Route>
         </Route>
 
