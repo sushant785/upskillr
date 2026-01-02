@@ -17,6 +17,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
 import Progress from './pages/Progress.jsx';
 import Enrollments from './pages/Instructor/Enrollments.jsx';
+import InstructorDashboard from './pages/Instructor/IntructorDashboard.jsx';
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
         
         <Route element={<ProtectedRoute allowedRoles={['instructor']} />}>
           <Route element={<InstructorLayout />}>
-            <Route path="/instructor/dashboard" element={<LearnerDashboard />} />
+            <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
             <Route path="/instructor/create-course" element={<CreateCourse />} />
             <Route path="/instructor/course/:courseId/manage" element={<CourseBuilder />} />
             <Route path="/instructor/courses" element={<InstructorCourses />} />
