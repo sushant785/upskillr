@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
-import { Search, Filter, Star, Clock, Users, PlayCircle } from 'lucide-react';
+import { Search, Filter, Star, Clock, Users, PlayCircle , Info} from 'lucide-react';
 
 const BrowseCourses = () => {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+
 
   const categories = ['All', 'Development', 'Design', 'Business', 'Marketing', 'Data Science'];
 
@@ -93,52 +97,75 @@ const handleEnroll = async (courseId) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredCourses.map((course) => (
-            <div key={course._id} className="group bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden hover:border-[var(--brand-primary)] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
-              
-              {/* Thumbnail Container */}
-              <div className="relative h-48 overflow-hidden">
-                <img 
-                  src={course.thumbnail || "https://via.placeholder.com/640x360?text=Course"} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                  alt={course.title} 
-                />
-                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest border border-white/10">
-                  {course.category || 'General'}
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 leading-tight group-hover:text-[var(--brand-primary)] transition-colors">
-                  {course.title}
-                </h3>
-                <p className="text-[var(--text-muted)] text-xs mb-4 flex items-center gap-1">
-                  By <span className="text-emerald-400 font-bold">{course.instructor?.name || 'Expert'}</span>
-                </p>
-
-                <div className="flex items-center gap-4 mb-6 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                  <span className="flex items-center gap-1"><Star size={14} className="text-amber-400" /> 4.8</span>
-                  <span className="flex items-center gap-1"><Users size={14} /> 1.2k Students</span>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-6 mt-auto gap-2">
-    <div className="flex flex-col">
-       <span className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest">Price</span>
-       <span className="text-xl font-black text-white leading-none">
-         {course.price === 0 ? "FREE" : `₹${course.price}`}
-       </span>
+            <div key={course._id} className="group bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden hover:border-[var(--brand-primary)] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] flex flex-col">
+  
+  {/* Thumbnail */}
+  <div 
+    className="relative h-48 overflow-hidden cursor-pointer"
+    onClick={() => navigate(`/learner/course/${course._id}`)}
+  >
+    <img 
+      src={course.thumbnail || "https://via.placeholder.com/640x360?text=Course"} 
+      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+      alt={course.title} 
+    />
+    <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest border border-white/10">
+      {course.category || 'General'}
     </div>
-       <button onClick={() => handleEnroll(course._id)}
-          className="bg-[var(--brand-primary)] text-[var(--text-on-brand)] px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[var(--brand-primary-hover)] transition-all active:scale-95 shadow-lg shadow-emerald-500/10">
-            Enroll Now</button>
-                </div>
-              </div>
-            </div>
+  </div>
+
+  {/* Card Body */}
+  <div className="p-6 flex flex-col flex-grow">
+    {/* Title  */}
+    <h3 
+      onClick={() => navigate(`/learner/course/${course._id}`)}
+      className="text-lg font-bold text-white mb-2 line-clamp-2 leading-tight cursor-pointer group-hover:text-emerald-400 transition-colors"
+    >
+      {course.title}
+    </h3>
+    
+    <p className="text-[var(--text-muted)] text-xs mb-4 flex items-center gap-1">
+      By <span className="text-emerald-400 font-bold">{course.instructor?.name || 'Expert'}</span>
+    </p>
+
+    <div className="flex items-center gap-4 mb-6 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+      <span className="flex items-center gap-1"><Star size={14} className="text-amber-400" /> 4.8</span>
+      <span className="flex items-center gap-1"><Users size={14} /> 1.2k Students</span>
+    </div>
+
+    {/* Buttons Container */}
+    <div className="mt-auto pt-6 border-t border-[var(--border-subtle)] flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest">Price</span>
+          <span className="text-xl font-black text-white leading-none">
+            {course.price === 0 ? "FREE" : `₹${course.price}`}
+          </span>
+        </div>
+        {/* Enrollment Button */}
+        <button 
+          onClick={(e) => { e.stopPropagation(); handleEnroll(course._id); }}
+          className="bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg active:scale-95"
+        >
+          Enroll Now
+        </button>
+      </div>
+
+      {/* Detail Button */}
+      <button 
+        onClick={() => navigate(`/learner/course/${course._id}`)}
+        className="w-full py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest border border-slate-700 hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+      >
+        <Info size={14} /> View Course Details
+      </button>
+    </div>
+  </div>
+</div>
           ))}
         </div>
       )}
     </div>
   );
-};
+}
 
 export default BrowseCourses;
