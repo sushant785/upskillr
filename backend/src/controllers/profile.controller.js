@@ -1,4 +1,5 @@
 import User from "../models/User.model.js";
+import bcrypt from "bcryptjs";
 
 // GET logged-in user profile
 export const getProfile = async (req, res) => {
@@ -18,7 +19,7 @@ export const getProfile = async (req, res) => {
 // UPDATE profile (name / password)
 export const updateProfile = async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { name, oldPassword, newPassword } = req.body;
 
     const user = await User.findById(req.user._id);
 
@@ -26,8 +27,21 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if(newPassword){
+      if(!oldPassword){
+        return res.status(400).json({message:"Please provide your old password"});
+
+      }
+
+      const isMatch=await bcrypt.compare(oldPassword,user.password);
+      if(!isMatch){
+        return res.status(401).json({message:"Old password is incorrect"});
+      }
+      user.password=newPassword; // will be hashed in pre-save hook
+    }
+
     if (name) user.name = name;
-    if (password) user.password = password; // auto-hashed
+    // if (password) user.password = password
 
     await user.save();
 
