@@ -7,10 +7,11 @@ import CreateCourse from './pages/Instructor/CreateCourse.jsx';
 import CourseBuilder from './pages/Instructor/CourseBuilder.jsx';
 import CoursePlayer from './pages/Dashboard/CoursePlayer.jsx'; //
 import CourseReview from './pages/Dashboard/CourseReview.jsx'; 
+import CourseDetail from './pages/Dashboard/CourseDetail.jsx'; 
 
 import LearnerLayout from './components/LearnerLayout.jsx';
 import InstructorLayout from './components/InstructorLayout.jsx';
-
+import InstructorDashboard from './pages/Instructor/InstructorDashboard.jsx'
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
