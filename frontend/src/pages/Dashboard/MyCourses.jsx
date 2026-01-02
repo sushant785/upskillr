@@ -53,7 +53,7 @@ const MyCourses = () => {
         {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-            <h1 className="text-3xl font-bold text-white mb-2">My Courses</h1>
+            <h1 className="text-3xl font-black text-[var(--text-main)] mb-2 tracking-tight">My Courses</h1>
             <p className="text-[var(--text-muted)]">Continue where you left off</p>
         </div>
       </div>
@@ -65,7 +65,7 @@ const MyCourses = () => {
           {enrollments.map((item) => {
             const { course, progressPercent, status } = item;
             return (
-            <div key={item._id} className="group flex flex-col bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden hover:border-[var(--brand-primary)] transition-all duration-300">
+            <div key={item._id} className="group flex flex-col bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2rem] overflow-hidden hover:border-emerald-500/60 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300">
               
               {/* Thumbnail Section */}
               <div className="relative h-48 overflow-hidden bg-slate-800">
@@ -85,8 +85,8 @@ const MyCourses = () => {
               </div>
 
               {/* Content Section */}
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-[var(--brand-primary)] transition-colors">
+              <div className="p-6 md:p-8 flex flex-col flex-grow">
+                <h3 className="text-xl font-bold text-[var(--text-main)] mb-3 line-clamp-2 group-hover:text-[var(--brand-primary)] transition-colors">
                   {course.title}
                 </h3>
                 
@@ -101,7 +101,7 @@ const MyCourses = () => {
                     {/* Progress Bar Section */}
               
 <div className="flex justify-between text-sm mb-2 font-medium">
-    <span className={item.progressPercent === 100 ? "text-emerald-400" : "text-white"}>
+    <span className={item.progressPercent === 100 ? "text-[var(--brand-primary)]" : "text-[var(--text-main)]"}>
         {item.progressPercent}% Completed
     </span>
     {item.progressPercent === 100 ? (
@@ -112,7 +112,7 @@ const MyCourses = () => {
 </div>
 
 {/* --- The Dynamic Progress Bar --- */}
-<div className="w-full bg-slate-700/50 h-2.5 rounded-full overflow-hidden mb-6">
+<div className="w-full bg-[var(--bg-input)] h-2.5 rounded-full overflow-hidden mb-6">
     <div 
         className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700 ease-out relative"
         style={{ width: `${item.progressPercent}%` }} 
@@ -137,9 +137,9 @@ const MyCourses = () => {
         </div>
       ) : (
         /* Empty State */
-        <div className="text-center py-24 bg-[var(--bg-card)] rounded-3xl border border-dashed border-[var(--border-subtle)]">
+        <div className="text-center py-24 bg-[var(--bg-card)] rounded-2xl md:rounded-[2.5rem] border border-dashed border-[var(--border-subtle)]">
           <PlayCircle size={64} className="text-[var(--text-muted)] mx-auto mb-6 opacity-50" />
-          <h2 className="text-2xl font-bold text-white mb-2">No courses yet</h2>
+          <h2 className="text-2xl font-bold text-[var(--text-main)] mb-2">No courses yet</h2>
           <p className="text-[var(--text-muted)] mb-8 max-w-md mx-auto">You haven't enrolled in any courses. Visit the browse page to start your journey.</p>
           <button onClick={() => navigate('/learner/browse')} className="px-8 py-3 bg-[var(--brand-primary)] text-[var(--text-on-brand)] rounded-xl font-bold hover:bg-[var(--brand-primary-hover)] transition-colors">
              Browse Courses

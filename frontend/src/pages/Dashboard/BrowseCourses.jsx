@@ -54,7 +54,7 @@ const handleEnroll = async (courseId) => {
       {/* --- Header & Search --- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Explore Courses</h1>
+          <h1 className="text-3xl font-black text-[var(--text-main)] mb-2 tracking-tight">Explore Courses</h1>
           <p className="text-[var(--text-muted)] text-sm">Discover thousands of courses taught by expert instructors</p>
         </div>
 
@@ -65,7 +65,7 @@ const handleEnroll = async (courseId) => {
             placeholder="Search for courses..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] h-12 py-4 pl-12 pr-4 rounded-2xl text-white focus:outline-none focus:border-[var(--brand-primary)] transition-all shadow-lg"
+            className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] h-12 py-4 pl-12 pr-4 rounded-2xl text-[var(--text-main)] focus:outline-none focus:border-[var(--brand-primary)] transition-all shadow-lg"
           />
         </div>
       </div>
@@ -79,7 +79,7 @@ const handleEnroll = async (courseId) => {
             className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap border ${
               selectedCategory === cat 
               ? 'bg-[var(--brand-primary)] text-[var(--text-on-brand)] border-[var(--brand-primary)]' 
-              : 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:border-[var(--brand-primary)] hover:text-white'
+              : 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:border-[var(--brand-primary)] hover:text-[var(--text-main)]'
             }`}
           >
             {cat}
@@ -109,7 +109,7 @@ const handleEnroll = async (courseId) => {
       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
       alt={course.title} 
     />
-    <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest border border-white/10">
+    <div className="absolute top-4 left-4 bg-[var(--bg-card)] backdrop-blur-md text-[var(--text-main)] text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest border border-[var(--border-subtle)] shadow-sm">
       {course.category || 'General'}
     </div>
   </div>
@@ -119,7 +119,7 @@ const handleEnroll = async (courseId) => {
     {/* Title  */}
     <h3 
       onClick={() => navigate(`/learner/course/${course._id}`)}
-      className="text-lg font-bold text-white mb-2 line-clamp-2 leading-tight cursor-pointer group-hover:text-emerald-400 transition-colors"
+      className="text-lg font-bold text-[var(--text-main)] mb-2 line-clamp-2 leading-tight cursor-pointer group-hover:text-emerald-400 transition-colors"
     >
       {course.title}
     </h3>
@@ -138,14 +138,14 @@ const handleEnroll = async (courseId) => {
       <div className="flex items-center justify-between">
         <div className="flex flex-col">
           <span className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest">Price</span>
-          <span className="text-xl font-black text-white leading-none">
+          <span className="text-xl font-black text-[var(--text-main)] leading-none">
             {course.price === 0 ? "FREE" : `₹${course.price}`}
           </span>
         </div>
         {/* Enrollment Button */}
         <button 
           onClick={(e) => { e.stopPropagation(); handleEnroll(course._id); }}
-          className="bg-emerald-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg active:scale-95"
+          className="bg-emerald-500 text-[var(--text-main)] px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg active:scale-95"
         >
           Enroll Now
         </button>
@@ -154,7 +154,7 @@ const handleEnroll = async (courseId) => {
       {/* Detail Button */}
       <button 
         onClick={() => navigate(`/learner/course/${course._id}`)}
-        className="w-full py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold text-[10px] uppercase tracking-widest border border-slate-700 hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+        className="w-full py-2.5 bg-[var(--bg-input)] text-[var(--text-muted)] rounded-xl font-bold text-[10px] uppercase tracking-widest border border-[var(--border-subtle)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] transition-all flex items-center justify-center gap-2"
       >
         <Info size={14} /> View Course Details
       </button>

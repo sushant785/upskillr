@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv  from "dotenv"
 import authRoutes from "./routes/auth.routes.js"
 import profileRoutes from "./routes/profile.routes.js";
@@ -19,6 +20,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send("Backend running");

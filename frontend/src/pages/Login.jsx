@@ -1,10 +1,13 @@
 
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Lock, GraduationCap, Presentation, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+
 const UpskillrAuth = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [role, setRole] = useState('learner');
@@ -13,6 +16,21 @@ const UpskillrAuth = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
+  const { setAuth } = useAuth();
+  const { auth } = useAuth();
+
+  useEffect(() => {
+    // If the user is already logged in...
+    if (auth?.accessToken && auth?.user) {
+      // ...send them to their dashboard immediately
+      if (auth.user.role === 'instructor') {
+        navigate('/instructor/dashboard');
+      } else {
+        navigate('/learner/dashboard');
+      }
+    }
+  }, [auth, navigate]);
+  
 
     // Inside your UpskillrAuth component:
     const handleSubmit = async (e) => {
@@ -30,6 +48,11 @@ const UpskillrAuth = () => {
         });
 
         if (response.status === 200 || response.status === 201) {
+          setAuth({
+            user: response.data.user,
+            accessToken: response.data.accessToken,
+            role: response.data.user.role
+          });
           alert(isLogin ? "Login Successful!" : "Registration Successful!");
           
           localStorage.setItem(

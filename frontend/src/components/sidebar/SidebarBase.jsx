@@ -2,13 +2,36 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { NavLink } from 'react-router-dom';
+import { NavLink,useNavigate } from 'react-router-dom';
 import { BrainCircuit, X, Settings, LogOut, Sun, Moon, ChevronRight } from 'lucide-react';
+import axios from 'axios'; 
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const SidebarBase = ({ navItems, isOpen, toggleSidebar }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const menuRef = useRef(null);
+
+  const { setAuth } = useAuth(); 
+  const navigate = useNavigate();
+
+const handleLogout = async () => {
+  try {
+      // 1. Tell server to delete cookie
+      await axios.post("http://localhost:5000/api/auth/logout", {}, {
+        withCredentials: true 
+      });
+
+      // 2. Clear app state
+      setAuth({ user: null, accessToken: null, role: null });
+
+      // 3. Go to login page
+      navigate("/");
+      
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   // Apply theme to document root
   useEffect(() => {
@@ -153,7 +176,7 @@ const SidebarBase = ({ navItems, isOpen, toggleSidebar }) => {
             </div>
 
             {/* LOGOUT BUTTON */}
-            <button className="group flex items-center gap-3 w-full p-3 text-red-500 hover:bg-red-500/10 rounded-xl mt-2 transition-colors">
+            <button onClick={handleLogout} className="group flex items-center gap-3 w-full p-3 text-red-500 hover:bg-red-500/10 rounded-xl mt-2 transition-colors">
               <LogOut
                 size={20}
                 className="transition-transform duration-500 group-hover:rotate-180"

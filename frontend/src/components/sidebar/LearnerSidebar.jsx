@@ -13,7 +13,6 @@ const learnerNavItems = [
   { path: '/learner/browse', icon: <Search size={20} />, label: 'Browse Courses' },
   { path: '/learner/my-courses', icon: <BookCheck size={20} />, label: 'My Courses' },
   { path: '/learner/progress', icon: <LineChart size={20} />, label: 'Progress' },
-  { path: '/learner/feedback', icon: <MessageSquare size={20} />, label: 'Feedback' },
   { path: '/profile', icon: <UserCircle size={20} />, label: 'Profile' },
 ];
 
