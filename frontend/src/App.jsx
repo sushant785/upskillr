@@ -18,14 +18,15 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
 import Progress from './pages/Progress.jsx';
 import Enrollments from './pages/Instructor/Enrollments.jsx';
+import LandingPage from './pages/LandingPage.jsx';
 
 function App() {
   return (
     <Router>
       <Routes>
 
-        
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
 
        
         <Route element={<ProtectedRoute allowedRoles={['learner']} />}>
