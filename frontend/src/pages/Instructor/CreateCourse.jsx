@@ -76,7 +76,9 @@ const CreateCourse = () => {
     };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 md:p-12 text-white font-['Poppins']">
+    // Root container uses bg-main
+    <div className="w-full min-h-screen bg-[var(--bg-main)] transition-colors duration-300 font-['Poppins']">
+        <div className="max-w-7xl mx-auto p-6 md:p-12 text-[var(--text-main)]">
       
       {/* --- HEADER --- */}
       <motion.div 
@@ -87,8 +89,8 @@ const CreateCourse = () => {
         <h1 className="text-3xl md:text-5xl font-black tracking-tight uppercase mb-2">
           Create Course
         </h1>
-        <p className="text-slate-400 text-sm md:text-lg">
-          Share your knowledge. Define the <span className="text-emerald-400 font-bold">next generation</span>.
+        <p className="text-[var(--text-muted)] text-sm md:text-lg">
+          Share your knowledge. Define the <span className="text-emerald-500 font-bold">next generation</span>.
         </p>
       </motion.div>
 
@@ -103,7 +105,8 @@ const CreateCourse = () => {
             transition={{ delay: 0.1 }}
             className="lg:col-span-2 space-y-8"
           >
-            <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8 md:p-10 space-y-8 relative overflow-hidden backdrop-blur-sm">
+            {/* CARD: Uses bg-card */}
+            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-[2rem] p-8 md:p-10 space-y-8 relative overflow-hidden backdrop-blur-sm shadow-sm">
               
               {/* Decorative Blur */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none"></div>
@@ -119,7 +122,8 @@ const CreateCourse = () => {
                   value={formData.title}
                   onChange={handleInputChange}
                   placeholder="e.g., Advanced Fullstack Architecture" 
-                  className="w-full bg-black/20 border border-white/10 rounded-2xl p-5 text-lg font-bold placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50 transition-all text-white"
+                  // INPUT: Uses bg-input
+                  className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-2xl p-5 text-lg font-bold placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500/50 transition-all text-[var(--text-main)]"
                   required
                 />
               </InputGroup>
@@ -135,7 +139,7 @@ const CreateCourse = () => {
                   onChange={handleInputChange}
                   rows={6}
                   placeholder="What will students learn in this course?"
-                  className="w-full bg-black/20 border border-white/10 rounded-2xl p-5 text-base text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50 transition-all resize-none"
+                  className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-2xl p-5 text-base text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500/50 transition-all resize-none"
                   required
                 />
               </InputGroup>
@@ -150,17 +154,18 @@ const CreateCourse = () => {
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      className="w-full bg-black/20 border border-white/10 rounded-2xl p-5 text-base text-slate-200 focus:outline-none focus:border-emerald-500/50 transition-all appearance-none cursor-pointer"
+                      className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-2xl p-5 text-base text-[var(--text-main)] focus:outline-none focus:border-emerald-500/50 transition-all appearance-none cursor-pointer"
                       required
                     >
-                      <option value="" disabled className="bg-slate-900 text-slate-500">Select a category</option>
-                      <option value="development" className="bg-slate-900 text-white">Development</option>
-                      <option value="business" className="bg-slate-900 text-white">Business</option>
-                      <option value="design" className="bg-slate-900 text-white">Design</option>
-                      <option value="marketing" className="bg-slate-900 text-white">Marketing</option>
+                      {/* Options usually need a solid background in dark mode to be readable */}
+                      <option value="" disabled className="bg-[var(--bg-base-solid)] text-[var(--text-muted)]">Select a category</option>
+                      <option value="development" className="bg-[var(--bg-base-solid)] text-[var(--text-main)]">Development</option>
+                      <option value="business" className="bg-[var(--bg-base-solid)] text-[var(--text-main)]">Business</option>
+                      <option value="design" className="bg-[var(--bg-base-solid)] text-[var(--text-main)]">Design</option>
+                      <option value="marketing" className="bg-[var(--bg-base-solid)] text-[var(--text-main)]">Marketing</option>
                     </select>
                     {/* Custom Arrow for consistency */}
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M6 9l6 6 6-6"/>
                       </svg>
@@ -177,7 +182,7 @@ const CreateCourse = () => {
                     placeholder="499"
                     min="0"
                     step="1"
-                    className="w-full bg-black/20 border border-white/10 rounded-2xl p-5 text-base text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50 transition-all"
+                    className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-2xl p-5 text-base text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500/50 transition-all"
                     required
                   />
                 </InputGroup>
@@ -195,15 +200,15 @@ const CreateCourse = () => {
           >
             
             {/* Thumbnail Upload Card */}
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 space-y-4">
-              <div className="flex items-center gap-2 text-slate-400 mb-2">
-                <ImageIcon size={20} className="text-emerald-400" />
+            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl p-6 md:p-8 space-y-4 shadow-sm">
+              <div className="flex items-center gap-2 text-[var(--text-muted)] mb-2">
+                <ImageIcon size={20} className="text-emerald-500" />
                 <span className="text-xs font-black uppercase tracking-widest">Course Thumbnail</span>
               </div>
 
               <div className={`
                 relative border-2 border-dashed rounded-3xl p-4 h-64 flex flex-col items-center justify-center text-center transition-all overflow-hidden group
-                ${previewUrl ? 'border-emerald-500/50 bg-black/40' : 'border-white/10 hover:bg-white/[0.02] hover:border-emerald-500/30 cursor-pointer'}
+                ${previewUrl ? 'border-emerald-500/50 bg-[var(--bg-input)]' : 'border-[var(--border-subtle)] hover:bg-[var(--bg-input)] hover:border-emerald-500/30 cursor-pointer'}
               `}>
                 
                 <AnimatePresence>
@@ -226,13 +231,13 @@ const CreateCourse = () => {
                       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                       className="flex flex-col items-center pointer-events-none"
                     >
-                      <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <UploadCloud size={28} className="text-emerald-400" />
+                      <div className="w-14 h-14 rounded-full bg-[var(--bg-main)] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm border border-[var(--border-subtle)]">
+                        <UploadCloud size={28} className="text-emerald-500" />
                       </div>
-                      <p className="text-slate-400 text-xs font-bold">
-                        <span className="text-emerald-400">Click to upload</span> or drag and drop
+                      <p className="text-[var(--text-muted)] text-xs font-bold">
+                        <span className="text-emerald-500">Click to upload</span> or drag and drop
                       </p>
-                      <p className="text-slate-600 text-[10px] mt-2">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+                      <p className="text-[var(--text-muted)] text-[10px] mt-2 opacity-70">SVG, PNG, JPG (max. 800x400px)</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -254,14 +259,14 @@ const CreateCourse = () => {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 rounded-xl bg-emerald-500 text-emerald-950 font-black text-sm uppercase tracking-wider hover:bg-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-4 rounded-xl bg-emerald-500 text-white font-black text-sm uppercase tracking-wider hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? <Loader2 className="animate-spin" /> : "Create Course"}
               </button>
               
               <button 
                 type="button"
-                className="w-full py-4 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-bold text-sm uppercase tracking-wider hover:bg-white/10 transition-all"
+                className="w-full py-4 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--text-muted)] font-bold text-sm uppercase tracking-wider hover:bg-[var(--bg-card)] transition-all"
               >
                 Save as Draft
               </button>
@@ -269,8 +274,8 @@ const CreateCourse = () => {
 
             {/* Quick Tips */}
             <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-5">
-              <h4 className="text-emerald-400 font-bold text-sm mb-2">Instructor Tips</h4>
-              <ul className="text-xs text-slate-400 space-y-2 list-disc list-inside">
+              <h4 className="text-emerald-600 dark:text-emerald-400 font-bold text-sm mb-2">Instructor Tips</h4>
+              <ul className="text-xs text-[var(--text-muted)] space-y-2 list-disc list-inside">
                 <li>Use a high-quality 16:9 thumbnail.</li>
                 <li>Keep titles concise and action-oriented.</li>
                 <li>Select the most relevant category.</li>
@@ -281,6 +286,7 @@ const CreateCourse = () => {
         </div>
       </form>
     </div>
+    </div>
   );
 };
 
@@ -289,8 +295,8 @@ const CreateCourse = () => {
 const InputGroup = ({ label, icon, children }) => (
   <div className="space-y-3">
     <div className="flex items-center gap-2 ml-1">
-      <span className="text-slate-500">{icon}</span>
-      <label className="text-xs font-black uppercase tracking-widest text-slate-500">{label}</label>
+      <span className="text-[var(--text-muted)]">{icon}</span>
+      <label className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{label}</label>
     </div>
     {children}
   </div>

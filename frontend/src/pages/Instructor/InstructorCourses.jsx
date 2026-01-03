@@ -34,19 +34,19 @@ const InstructorCourses = () => {
   );
 
   if (loading) return (
-    <div className="flex h-[50vh] items-center justify-center text-emerald-500">
+    <div className="flex h-[50vh] items-center justify-center bg-[var(--bg-main)] text-emerald-500">
       <Loader2 className="animate-spin" size={40} />
     </div>
   );
 
   return (
-    <div className="text-white font-['Poppins'] p-6 md:p-12">
+    <div className="font-['Poppins'] p-6 md:p-12 min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300">
       
       {/* --- HEADER --- */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
           <h1 className="text-3xl md:text-5xl font-black tracking-tight uppercase mb-2">My Teaching Hub</h1>
-          <p className="text-slate-400">Manage your content and track performance.</p>
+          <p className="text-[var(--text-muted)]">Manage your content and track performance.</p>
         </div>
         <button 
           onClick={() => navigate('/instructor/create-course')}
@@ -58,20 +58,20 @@ const InstructorCourses = () => {
 
       {/* --- SEARCH & FILTERS --- */}
       <div className="mb-8 relative max-w-md">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" size={20} />
         <input 
           type="text"
           placeholder="Search your courses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-slate-300 focus:outline-none focus:border-emerald-500/50 transition-all"
+          className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-2xl py-3 pl-12 pr-4 text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-emerald-500/50 transition-all"
         />
       </div>
 
       {/* --- COURSE GRID --- */}
       {filteredCourses.length === 0 ? (
-        <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
-          <p className="text-slate-500 font-bold">No courses found.</p>
+        <div className="text-center py-20 bg-[var(--bg-card)] rounded-3xl border border-dashed border-[var(--border-subtle)]">
+          <p className="text-[var(--text-muted)] font-bold">No courses found.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -90,7 +90,7 @@ const CourseCard = ({ course, navigate }) => {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:border-emerald-500/30 transition-all flex flex-col h-full"
+      className="group bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden hover:shadow-lg transition-all flex flex-col h-full"
     >
       {/* Thumbnail */}
       <div className="relative h-48 overflow-hidden">
@@ -102,8 +102,8 @@ const CourseCard = ({ course, navigate }) => {
         <div className="absolute top-4 right-4">
           <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md ${
             course.isPublished 
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+              ? 'bg-emerald-500/90 text-white border border-emerald-500/30' 
+              : 'bg-yellow-500/90 text-white border border-yellow-500/30'
           }`}>
             {course.isPublished ? 'Published' : 'Draft'}
           </span>
@@ -112,17 +112,17 @@ const CourseCard = ({ course, navigate }) => {
 
       {/* Content */}
       <div className="p-6 flex flex-col flex-1">
-        <h3 className="text-lg font-bold mb-2 line-clamp-1" title={course.title}>
+        <h3 className="text-lg font-bold mb-2 line-clamp-1 text-[var(--text-main)]" title={course.title}>
           {course.title}
         </h3>
         
-        <div className="flex items-center gap-4 text-xs font-bold text-slate-400 mb-6">
+        <div className="flex items-center gap-4 text-xs font-bold text-[var(--text-muted)] mb-6">
           <div className="flex items-center gap-1">
-            <Users size={14} className="text-blue-400" />
+            <Users size={14} className="text-blue-500" />
             <span>{course.studentsCount || 0} Students</span>
           </div>
           <div className="flex items-center gap-1">
-            <Star size={14} className="text-yellow-400" />
+            <Star size={14} className="text-yellow-500" />
             <span>{course.averageRating || "N/A"}</span>
           </div>
         </div>
@@ -131,12 +131,12 @@ const CourseCard = ({ course, navigate }) => {
           {/* THE EDIT BUTTON - Reuses the Builder Route */}
           <button 
             onClick={() => navigate(`/instructor/course/${course._id}/manage`)}
-            className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 flex items-center justify-center gap-2 transition-all"
+            className="flex-1 py-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--text-main)] font-bold text-sm hover:brightness-95 dark:hover:brightness-110 flex items-center justify-center gap-2 transition-all"
           >
             <Edit3 size={16} /> Edit
           </button>
           
-          <button className="p-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
+          <button className="p-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 transition-all">
             <Trash2 size={18} />
           </button>
         </div>

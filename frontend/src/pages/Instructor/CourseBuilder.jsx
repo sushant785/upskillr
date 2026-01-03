@@ -222,18 +222,19 @@ const CourseBuilder = () => {
 
   // --- RENDER ---
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f172a] text-white">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300">
         <Loader2 className="animate-spin text-emerald-500" size={40} />
     </div>
   );
 
-  if (!course) return <div className="text-white text-center mt-20">Course Not Found</div>;
+  if (!course) return <div className="text-[var(--text-main)] text-center mt-20">Course Not Found</div>;
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 md:p-12 text-white font-['Poppins']">
+    <div className="w-full min-h-screen bg-[var(--bg-main)] transition-colors duration-300 font-['Poppins']">
+        <div className="max-w-7xl mx-auto p-6 md:p-12 text-[var(--text-main)]">
       
       {/* HEADER */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-white/10 pb-8">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-[var(--border-subtle)] pb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${course.isPublished ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'}`}>
@@ -241,13 +242,13 @@ const CourseBuilder = () => {
             </span>
             <h1 className="text-2xl md:text-3xl font-black tracking-tight">{course.title}</h1>
           </div>
-          <p className="text-slate-400 text-sm">Manage your curriculum and content.</p>
+          <p className="text-[var(--text-muted)] text-sm">Manage your curriculum and content.</p>
         </div>
 
         <div className="flex gap-3">
             <button 
                 onClick={handlePublishToggle}
-                className={`px-6 py-3 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2 ${course.isPublished ? 'bg-yellow-500 text-yellow-950 hover:bg-yellow-400' : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400'}`}
+                className={`px-6 py-3 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center gap-2 ${course.isPublished ? 'bg-yellow-500 text-yellow-950 hover:bg-yellow-400' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
             >
                 <Globe size={18} /> {course.isPublished ? 'Unpublish' : 'Publish Course'}
             </button>
@@ -255,28 +256,30 @@ const CourseBuilder = () => {
       </header>
 
       {/* TABS */}
-      <div className="flex gap-8 mb-8 border-b border-white/5 text-sm font-bold text-slate-500">
-        <button onClick={() => setActiveTab('curriculum')} className={`pb-4 transition-colors ${activeTab === 'curriculum' ? 'text-emerald-400 border-b-2 border-emerald-400' : 'hover:text-white'}`}>Curriculum</button>
-        <button onClick={() => setActiveTab('settings')} className={`pb-4 transition-colors ${activeTab === 'settings' ? 'text-emerald-400 border-b-2 border-emerald-400' : 'hover:text-white'}`}>Course Settings</button>
+      <div className="flex gap-8 mb-8 border-b border-[var(--border-subtle)] text-sm font-bold text-[var(--text-muted)]">
+        <button onClick={() => setActiveTab('curriculum')} className={`pb-4 transition-colors ${activeTab === 'curriculum' ? 'text-emerald-500 border-b-2 border-emerald-500' : 'hover:text-[var(--text-main)]'}`}>Curriculum</button>
+        <button onClick={() => setActiveTab('settings')} className={`pb-4 transition-colors ${activeTab === 'settings' ? 'text-emerald-500 border-b-2 border-emerald-500' : 'hover:text-[var(--text-main)]'}`}>Course Settings</button>
       </div>
+      
+      
 
       {/* --- CURRICULUM TAB --- */}
       {activeTab === 'curriculum' && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           
           <div className="space-y-4">
-            {sections.length === 0 && <div className="text-slate-500 text-center py-10 bg-white/5 rounded-2xl">No modules yet. Click below to add one.</div>}
+            {sections.length === 0 && <div className="text-[var(--text-muted)] text-center py-10 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-subtle)]">No modules yet. Click below to add one.</div>}
 
             {sections.map((section) => (
-              <div key={section._id} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-                <div className="p-4 bg-white/[0.02] flex items-center justify-between group hover:bg-white/[0.04] transition-colors">
+              <div key={section._id} className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden shadow-sm">
+                <div className="p-4 bg-[var(--bg-card)] flex items-center justify-between group hover:bg-[var(--bg-input)] transition-colors">
                   <div className="flex items-center gap-4 cursor-pointer select-none" onClick={() => setExpandedModules(p => ({...p, [section._id]: !p[section._id]}))}>
-                    <div className="p-2 bg-white/5 rounded-lg text-slate-400"><GripVertical size={16} /></div>
-                    <h3 className="font-bold text-lg text-slate-200">{section.title}</h3>
+                    <div className="p-2 bg-[var(--bg-input)] rounded-lg text-[var(--text-muted)]"><GripVertical size={16} /></div>
+                    <h3 className="font-bold text-lg text-[var(--text-main)]">{section.title}</h3>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button onClick={() => handleDeleteSection(section._id)} className="p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-400 rounded-lg"><Trash2 size={16} /></button>
-                    <button onClick={() => setExpandedModules(p => ({...p, [section._id]: !p[section._id]}))} className="p-2 hover:bg-white/10 rounded-lg text-slate-400">
+                    <button onClick={() => handleDeleteSection(section._id)} className="p-2 hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500 rounded-lg"><Trash2 size={16} /></button>
+                    <button onClick={() => setExpandedModules(p => ({...p, [section._id]: !p[section._id]}))} className="p-2 hover:bg-[var(--bg-input)] rounded-lg text-[var(--text-muted)]">
                        {expandedModules[section._id] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                     </button>
                   </div>
@@ -284,23 +287,23 @@ const CourseBuilder = () => {
 
                 <AnimatePresence>
                   {expandedModules[section._id] && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-white/5">
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-[var(--border-subtle)]">
                       <div className="p-4 space-y-3">
-                        {(!section.lessons || section.lessons.length === 0) && <p className="text-xs text-slate-500 italic pl-2">No lessons yet.</p>}
+                        {(!section.lessons || section.lessons.length === 0) && <p className="text-xs text-[var(--text-muted)] italic pl-2">No lessons yet.</p>}
 
                         {section.lessons && section.lessons.map((lesson) => (
-                          <div key={lesson._id} className="flex items-center justify-between p-3 rounded-xl bg-black/20 border border-white/5 group">
+                          <div key={lesson._id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] group">
                             <div className="flex items-center gap-4">
-                              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400"><PlayCircle size={18} /></div>
-                              <h4 className="text-sm font-bold text-slate-200">{lesson.title}</h4>
+                              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500"><PlayCircle size={18} /></div>
+                              <h4 className="text-sm font-bold text-[var(--text-main)]">{lesson.title}</h4>
                             </div>
-                            <button onClick={() => handleDeleteLesson(lesson._id, section._id)} className="p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
+                            <button onClick={() => handleDeleteLesson(lesson._id, section._id)} className="p-2 hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
                                 <Trash2 size={14} />
                             </button>
                           </div>
                         ))}
                         
-                        <button onClick={() => { setCurrentSectionId(section._id); setIsAddingLesson(true); }} className="w-full py-3 rounded-xl border border-dashed border-white/10 text-slate-400 text-xs font-bold uppercase tracking-widest hover:bg-white/[0.02] hover:border-emerald-500/50 hover:text-emerald-400 transition-all flex items-center justify-center gap-2">
+                        <button onClick={() => { setCurrentSectionId(section._id); setIsAddingLesson(true); }} className="w-full py-3 rounded-xl border border-dashed border-[var(--border-subtle)] text-[var(--text-muted)] text-xs font-bold uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-emerald-500/50 hover:text-emerald-500 transition-all flex items-center justify-center gap-2">
                           <Plus size={16} /> Add Lesson
                         </button>
                       </div>
@@ -311,7 +314,7 @@ const CourseBuilder = () => {
             ))}
           </div>
 
-          <button onClick={handleAddSection} className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+          <button onClick={handleAddSection} className="w-full py-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-main)] font-bold hover:bg-[var(--bg-input)] transition-all flex items-center justify-center gap-2">
             <Plus size={20} /> Add New Module
           </button>
         </motion.div>
@@ -320,19 +323,19 @@ const CourseBuilder = () => {
       {/* --- SETTINGS TAB --- */}
       {activeTab === 'settings' && (
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="max-w-3xl">
-            <form onSubmit={handleUpdateSettings} className="space-y-8 bg-white/5 border border-white/10 p-8 rounded-[2rem]">
+            <form onSubmit={handleUpdateSettings} className="space-y-8 bg-[var(--bg-card)] border border-[var(--border-subtle)] p-8 rounded-[2rem] shadow-sm">
                 <div className="space-y-4">
-                    <label className="text-xs font-black text-slate-500 uppercase">Course Title</label>
-                    <input name="title" defaultValue={course.title} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-emerald-500 transition-colors" />
+                    <label className="text-xs font-black text-[var(--text-muted)] uppercase">Course Title</label>
+                    <input name="title" defaultValue={course.title} className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl p-4 text-[var(--text-main)] focus:outline-none focus:border-emerald-500 transition-colors" />
                 </div>
                 <div className="space-y-4">
-                    <label className="text-xs font-black text-slate-500 uppercase">Description</label>
-                    <textarea name="description" rows={5} defaultValue={course.description} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-slate-300 focus:outline-none resize-none focus:border-emerald-500 transition-colors" />
+                    <label className="text-xs font-black text-[var(--text-muted)] uppercase">Description</label>
+                    <textarea name="description" rows={5} defaultValue={course.description} className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl p-4 text-[var(--text-main)] focus:outline-none resize-none focus:border-emerald-500 transition-colors" />
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase">Category</label>
-                        <select name="category" defaultValue={course.category || "Web Development"} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                        <label className="text-xs font-black text-[var(--text-muted)] uppercase">Category</label>
+                        <select name="category" defaultValue={course.category || "Web Development"} className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl p-4 text-[var(--text-main)] focus:outline-none focus:border-emerald-500 transition-colors">
                             <option value="Web Development">Web Development</option>
                             <option value="Data Science">Data Science</option>
                             <option value="UI/UX Design">UI/UX Design</option>
@@ -341,29 +344,29 @@ const CourseBuilder = () => {
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase">Price</label>
-                        <input type="number" name="price" defaultValue={course.price} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:border-emerald-500 transition-colors" />
+                        <label className="text-xs font-black text-[var(--text-muted)] uppercase">Price</label>
+                        <input type="number" name="price" defaultValue={course.price} className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl p-4 text-[var(--text-main)] focus:outline-none focus:border-emerald-500 transition-colors" />
                     </div>
                 </div>
                 <div className="space-y-4">
-                    <label className="text-xs font-black text-slate-500 uppercase">Thumbnail</label>
+                    <label className="text-xs font-black text-[var(--text-muted)] uppercase">Thumbnail</label>
                     <div className="flex items-center gap-4">
                          {course.thumbnail && course.thumbnail.length > 0 ? (
-                            <img src={course.thumbnail} alt="preview" className="w-32 h-20 object-cover rounded-lg border border-white/10" />
+                            <img src={course.thumbnail} alt="preview" className="w-32 h-20 object-cover rounded-lg border border-[var(--border-subtle)]" />
                         ) : (
-                            <div className="w-32 h-20 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center text-slate-500 text-xs">No Image</div>
+                            <div className="w-32 h-20 bg-[var(--bg-input)] rounded-lg border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] text-xs">No Image</div>
                         )}
-                        <input type="file" name="thumbnail" accept="image/*" className="w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20" />
+                        <input type="file" name="thumbnail" accept="image/*" className="w-full text-[var(--text-muted)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-emerald-500/10 file:text-emerald-500 hover:file:bg-emerald-500/20" />
                     </div>
                 </div>
-                <button type="submit" disabled={uploading} className="w-full py-4 bg-emerald-500 text-emerald-950 font-bold rounded-xl hover:bg-emerald-400 flex items-center justify-center gap-2 transition-all">
+                <button type="submit" disabled={uploading} className="w-full py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 flex items-center justify-center gap-2 transition-all">
                     {uploading ? <Loader2 className="animate-spin" /> : <><Save size={20} /> Save Changes</>}
                 </button>
             </form>
 
             <div className="mt-8 p-8 border border-red-500/20 bg-red-500/5 rounded-[2rem]">
                 <h3 className="text-red-500 font-bold text-lg mb-2">Danger Zone</h3>
-                <p className="text-slate-400 text-sm mb-6">Deleting this course will remove all sections and lessons permanently.</p>
+                <p className="text-[var(--text-muted)] text-sm mb-6">Deleting this course will remove all sections and lessons permanently.</p>
                 <button onClick={handleDeleteCourse} className="px-6 py-3 bg-red-500/10 border border-red-500/50 text-red-500 font-bold rounded-xl hover:bg-red-500 hover:text-white transition-all flex items-center gap-2">
                     <Trash2 size={18} /> Delete Course
                 </button>
@@ -374,40 +377,40 @@ const CourseBuilder = () => {
       {/* --- ADD LESSON MODAL (UPDATED WITH ATTACHMENT) --- */}
       {isAddingLesson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0f172a] border border-white/10 rounded-3xl p-8 w-full max-w-lg shadow-2xl relative">
-            <button onClick={() => setIsAddingLesson(false)} className="absolute top-6 right-6 text-slate-500 hover:text-white"><X size={20}/></button>
-            <h3 className="text-xl font-bold mb-6">Add New Lesson</h3>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl p-8 w-full max-w-lg shadow-2xl relative">
+            <button onClick={() => setIsAddingLesson(false)} className="absolute top-6 right-6 text-[var(--text-muted)] hover:text-[var(--text-main)]"><X size={20}/></button>
+            <h3 className="text-xl font-bold mb-6 text-[var(--text-main)]">Add New Lesson</h3>
             
             <div className="space-y-5">
               
               {/* 1. Title Input */}
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase">Lesson Title</label>
+                <label className="text-xs font-black text-[var(--text-muted)] uppercase">Lesson Title</label>
                 <input 
                     type="text" 
                     value={lessonForm.title}
                     onChange={(e) => setLessonForm({...lessonForm, title: e.target.value})}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 transition-colors" 
+                    className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl p-3 text-[var(--text-main)] focus:outline-none focus:border-emerald-500 transition-colors" 
                     placeholder="e.g. Intro to Hooks" 
                 />
               </div>
 
               {/* 2. Video Input */}
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase flex items-center gap-2">
+                <label className="text-xs font-black text-[var(--text-muted)] uppercase flex items-center gap-2">
                    <Video size={14} /> Video File (Required)
                 </label>
                 <input 
                     type="file" 
                     accept="video/*"
                     onChange={(e) => setLessonForm({...lessonForm, video: e.target.files[0]})}
-                    className="w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20 cursor-pointer" 
+                    className="w-full text-[var(--text-muted)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-500/10 file:text-blue-500 hover:file:bg-blue-500/20 cursor-pointer" 
                 />
               </div>
 
               {/* 3. Attachment Input (REQUIRED by Backend) */}
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase flex items-center gap-2">
+                <label className="text-xs font-black text-[var(--text-muted)] uppercase flex items-center gap-2">
                    <Paperclip size={14} /> Attachment / Resource (Required)
                 </label>
                 <input 
@@ -415,17 +418,17 @@ const CourseBuilder = () => {
                     // Accepting common formats; adjust as needed
                     accept=".pdf,.zip,.png,.jpg,.jpeg,.doc,.docx"
                     onChange={(e) => setLessonForm({...lessonForm, resource: e.target.files[0]})}
-                    className="w-full text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-500/10 file:text-purple-400 hover:file:bg-purple-500/20 cursor-pointer" 
+                    className="w-full text-[var(--text-muted)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-500/10 file:text-purple-500 hover:file:bg-purple-500/20 cursor-pointer" 
                 />
-                <p className="text-[10px] text-slate-500">Must upload a file (PDF, Zip, Image) to create lesson.</p>
+                <p className="text-[10px] text-[var(--text-muted)]">Must upload a file (PDF, Zip, Image) to create lesson.</p>
               </div>
 
               <div className="pt-4 flex gap-3">
-                <button onClick={() => setIsAddingLesson(false)} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-sm transition-colors">Cancel</button>
+                <button onClick={() => setIsAddingLesson(false)} className="flex-1 py-3 rounded-xl bg-[var(--bg-input)] hover:brightness-110 text-[var(--text-muted)] font-bold text-sm transition-colors">Cancel</button>
                 <button 
                     onClick={handleUploadLesson} 
                     disabled={uploading}
-                    className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {uploading ? <Loader2 className="animate-spin" /> : 'Upload Lesson'}
                 </button>
@@ -434,7 +437,7 @@ const CourseBuilder = () => {
           </motion.div>
         </div>
       )}
-
+    </div>
     </div>
   );
 };

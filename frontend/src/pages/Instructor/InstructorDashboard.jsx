@@ -99,8 +99,8 @@ const InstructorDashboard = () => {
 
   // --- LOADING STATE ---
   if (loading) return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-900/20 via-slate-950 to-slate-950 animate-pulse" />
+    <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center relative overflow-hidden transition-colors duration-300">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent animate-pulse" />
         <motion.div 
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -113,12 +113,12 @@ const InstructorDashboard = () => {
 
   // --- ERROR STATE ---
   if (error) return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center p-8 relative overflow-hidden transition-colors duration-300">
         <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
         
-        <div className="text-center relative z-10 bg-slate-900/80 p-10 rounded-3xl border border-red-500/20 backdrop-blur-xl shadow-2xl">
+        <div className="text-center relative z-10 bg-[var(--bg-card)] p-10 rounded-3xl border border-red-500/20 backdrop-blur-xl shadow-2xl">
             <h2 className="text-2xl font-black text-red-500 mb-2 uppercase tracking-tighter">Connection Error</h2>
-            <p className="text-slate-400 text-sm mb-8 font-mono">{error}</p>
+            <p className="text-[var(--text-muted)] text-sm mb-8 font-mono">{error}</p>
             <button 
                 onClick={() => window.location.reload()}
                 className="px-8 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/50 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
@@ -130,7 +130,7 @@ const InstructorDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-['Poppins'] flex flex-col relative overflow-hidden selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-['Poppins'] flex flex-col relative overflow-hidden selection:bg-emerald-500/30 selection:text-emerald-200 transition-colors duration-300">
       
       {/* --- AMBIENT BACKGROUNDS --- */}
       <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none animate-pulse" />
@@ -148,12 +148,12 @@ const InstructorDashboard = () => {
           >
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                    Instructor Hub
                 </div>
               </div>
-              <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-500 leading-[1.1]">
+              <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-[var(--text-main)] leading-[1.1]">
                 {timeGreeting}
               </h1>
             </div>
@@ -164,7 +164,7 @@ const InstructorDashboard = () => {
                 whileTap={{ scale: 0.95 }}
                 // 3. Navigation: Create Course
                 onClick={() => navigate('/instructor/create-course')}
-                className="flex items-center gap-2 px-8 py-4 bg-emerald-500 text-slate-950 font-black uppercase tracking-widest text-xs rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)] transition-all group"
+                className="flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)] transition-all group"
               >
                 <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" /> 
                 <span>Create Course</span>
@@ -173,10 +173,10 @@ const InstructorDashboard = () => {
               <motion.button 
                 whileHover={{ scale: 1.1, rotate: 15 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-4 bg-slate-900 border border-white/10 rounded-2xl relative hover:bg-white/5 transition-all group"
+                className="p-4 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl relative hover:brightness-110 transition-all group"
               >
-                <Bell size={20} className="text-slate-400 group-hover:text-white transition-colors" />
-                <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full ring-4 ring-slate-900" />
+                <Bell size={20} className="text-[var(--text-muted)] group-hover:text-[var(--text-main)] transition-colors" />
+                <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full" />
               </motion.button>
             </div>
           </motion.header>
@@ -227,13 +227,13 @@ const InstructorDashboard = () => {
                 
                 {/* Section Title */}
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-white flex items-center gap-3">
+                    <h3 className="text-xl font-bold text-[var(--text-main)] flex items-center gap-3">
                         <LayoutGrid className="text-emerald-500" /> Recent Courses
                     </h3>
                     <button 
                       // 4. Navigation: View All Courses
                       onClick={() => navigate('/instructor/courses')}
-                      className="text-xs font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors"
+                      className="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text-main)] uppercase tracking-widest transition-colors"
                     >
                         View All Courses &rarr;
                     </button>
@@ -242,7 +242,7 @@ const InstructorDashboard = () => {
                 {/* Course List Container */}
                 <div className="relative group">
                     <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000" />
-                    <div className="relative bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 overflow-hidden">
+                    <div className="relative bg-[var(--bg-card)] backdrop-blur-xl border border-[var(--border-subtle)] rounded-[2.5rem] p-8 overflow-hidden">
                         
                         <div className="space-y-4">
                             {dashboardData.recentCourses && dashboardData.recentCourses.length > 0 ? (
@@ -250,11 +250,11 @@ const InstructorDashboard = () => {
                                     <CourseRow key={course._id} course={course} />
                                 ))
                             ) : (
-                                <div className="text-center py-16 border-2 border-dashed border-white/5 rounded-3xl">
-                                    <div className="inline-block p-4 rounded-full bg-white/5 mb-4">
-                                        <LayoutGrid className="text-slate-500" size={32} />
+                                <div className="text-center py-16 border-2 border-dashed border-[var(--border-subtle)] rounded-3xl">
+                                    <div className="inline-block p-4 rounded-full bg-[var(--bg-input)] mb-4">
+                                        <LayoutGrid className="text-[var(--text-muted)]" size={32} />
                                     </div>
-                                    <p className="text-slate-400 font-bold">No Courses Found</p>
+                                    <p className="text-[var(--text-muted)] font-bold">No Courses Found</p>
                                     <button 
                                       onClick={() => navigate('/instructor/create-course')}
                                       className="text-xs text-emerald-500 hover:text-emerald-400 mt-2 font-mono uppercase tracking-widest"
@@ -290,12 +290,12 @@ const InstructorDashboard = () => {
               <motion.aside variants={itemVariants} className="space-y-6">
                 
                 {/* Live Feed Panel */}
-                <div className="bg-slate-900 border border-white/10 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+                <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-[2rem] p-8 shadow-sm relative overflow-hidden">
                    {/* Decorative gradient blob */}
                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                   <h3 className="font-bold text-lg text-white mb-6 flex items-center gap-3">
-                      <Activity className="text-emerald-400 animate-pulse" size={18} /> 
+                   <h3 className="font-bold text-lg text-[var(--text-main)] mb-6 flex items-center gap-3">
+                      <Activity className="text-emerald-500 animate-pulse" size={18} /> 
                       <span className="uppercase tracking-widest text-xs">Recent Enrollments</span>
                    </h3>
 
@@ -306,14 +306,14 @@ const InstructorDashboard = () => {
                           ))
                       ) : (
                           <div className="text-center py-8 opacity-40">
-                              <p className="text-xs font-mono">NO RECENT ACTIVITY</p>
+                              <p className="text-xs font-mono text-[var(--text-muted)]">NO RECENT ACTIVITY</p>
                           </div>
                       )}
                    </div>
 
                    <button 
                       onClick={() => navigate('/instructor/enrollments')}
-                      className="w-full mt-8 py-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group"
+                      className="w-full mt-8 py-4 bg-[var(--bg-input)] hover:brightness-110 border border-[var(--border-subtle)] rounded-xl text-[10px] text-[var(--text-main)] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group"
                    >
                       View All Activity <ArrowUpRight size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                    </button>
@@ -321,17 +321,17 @@ const InstructorDashboard = () => {
 
                 {/* Insight Card */}
                 <div className="p-1 rounded-[2rem] bg-gradient-to-br from-emerald-500/30 to-blue-600/30">
-                    <div className="bg-slate-950 rounded-[1.8rem] p-6 h-full relative overflow-hidden group">
+                    <div className="bg-[var(--bg-base-solid)] rounded-[1.8rem] p-6 h-full relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         
                         <div className="relative z-10 flex items-start gap-4">
-                            <div className="p-3 bg-slate-900 rounded-xl border border-white/10 text-emerald-400 shrink-0">
+                            <div className="p-3 bg-[var(--bg-input)] rounded-xl border border-[var(--border-subtle)] text-emerald-500 shrink-0">
                                 <Sparkles size={24} />
                             </div>
                             <div>
-                                <h4 className="font-black text-white text-lg italic tracking-tight">Quick Insight</h4>
-                                <p className="text-xs text-slate-400 mt-2 leading-relaxed font-medium">
-                                    You have <span className="text-emerald-400 font-bold">{dashboardData.draftCourses || 0} courses</span> currently in draft. Publishing them could increase your student reach by <span className="text-white border-b border-emerald-500">40%</span>.
+                                <h4 className="font-black text-[var(--text-main)] text-lg italic tracking-tight">Quick Insight</h4>
+                                <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed font-medium">
+                                    You have <span className="text-emerald-500 font-bold">{dashboardData.draftCourses || 0} courses</span> currently in draft. Publishing them could increase your student reach by <span className="text-[var(--text-main)] border-b border-emerald-500">40%</span>.
                                 </p>
                             </div>
                         </div>
@@ -351,31 +351,33 @@ const InstructorDashboard = () => {
 // --- SUB-COMPONENTS ---
 
 const StatCard = ({ label, value, icon, color, trend }) => {
+    // Note: Backgrounds set to use variables or specific colors that work on both
     const colors = {
-        blue: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-        emerald: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-        orange: "text-orange-400 bg-orange-500/10 border-orange-500/20",
-        purple: "text-purple-400 bg-purple-500/10 border-purple-500/20",
+        blue: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+        emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+        orange: "text-orange-500 bg-orange-500/10 border-orange-500/20",
+        purple: "text-purple-500 bg-purple-500/10 border-purple-500/20",
     };
 
     return (
         <motion.div 
             variants={statCardVariants}
             whileHover="hover"
-            className={`p-6 rounded-[2rem] border ${colors[color]} bg-slate-900/50 backdrop-blur-md relative overflow-hidden group cursor-default`}
+            // Use bg-card from variables to maintain black theme default
+            className={`p-6 rounded-[2rem] border ${colors[color]} bg-[var(--bg-card)] backdrop-blur-md relative overflow-hidden group cursor-default`}
         >
             <div className="relative z-10 flex flex-col h-full justify-between gap-4">
                 <div className="flex justify-between items-start">
                     <div className={`p-3 rounded-2xl ${colors[color].split(" ")[1]} backdrop-blur-sm`}>
                         {React.cloneElement(icon, { size: 24 })}
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-wider bg-white/5 px-2 py-1 rounded text-white/70">
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-[var(--bg-input)] px-2 py-1 rounded text-[var(--text-muted)]">
                         {trend}
                     </span>
                 </div>
                 <div>
-                    <h4 className="text-4xl font-black text-white tracking-tight">{value}</h4>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mt-1">{label}</p>
+                    <h4 className="text-4xl font-black text-[var(--text-main)] tracking-tight">{value}</h4>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mt-1 text-[var(--text-muted)]">{label}</p>
                 </div>
             </div>
             {/* Background Glow */}
@@ -395,19 +397,19 @@ const CourseRow = ({ course }) => {
 
     return (
       <motion.div 
-          whileHover={{ x: 5, backgroundColor: "rgba(255,255,255,0.03)" }}
+          whileHover={{ x: 5 }}
           onClick={handleManage} // Navigate when clicking the row
-          className="group flex items-center justify-between p-4 rounded-2xl border border-white/5 bg-white/[0.01] transition-all cursor-pointer"
+          className="group flex items-center justify-between p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-input)] hover:brightness-105 transition-all cursor-pointer"
       >
           <div className="flex items-center gap-5">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center font-black text-slate-700 text-xl group-hover:text-emerald-500 group-hover:border-emerald-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] flex items-center justify-center font-black text-[var(--text-muted)] text-xl group-hover:text-emerald-500 group-hover:border-emerald-500/30 transition-all">
                   {course.title ? course.title.charAt(0) : "X"}
               </div>
               <div>
-                  <h5 className="font-bold text-white text-base group-hover:text-emerald-400 transition-colors">{course.title}</h5>
+                  <h5 className="font-bold text-[var(--text-main)] text-base group-hover:text-emerald-500 transition-colors">{course.title}</h5>
                   <div className="flex items-center gap-3 mt-1.5">
-                      <span className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${course.isPublished ? 'text-emerald-400' : 'text-yellow-400'}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${course.isPublished ? 'bg-emerald-400' : 'bg-yellow-400'} animate-pulse`} />
+                      <span className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${course.isPublished ? 'text-emerald-500' : 'text-yellow-500'}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${course.isPublished ? 'bg-emerald-500' : 'bg-yellow-500'} animate-pulse`} />
                           {course.isPublished ? "Published" : "Draft"}
                       </span>
                   </div>
@@ -416,9 +418,9 @@ const CourseRow = ({ course }) => {
           
           <div className="flex items-center gap-6 pr-4">
               <div className="text-right hidden sm:block">
-                  <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest group-hover:text-white transition-colors">Manage</span>
+                  <span className="text-[9px] text-[var(--text-muted)] uppercase font-black tracking-widest group-hover:text-[var(--text-main)] transition-colors">Manage</span>
               </div>
-              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-500 group-hover:bg-emerald-500 group-hover:text-slate-900 transition-all">
+              <div className="w-8 h-8 rounded-full bg-[var(--bg-card)] flex items-center justify-center text-[var(--text-muted)] group-hover:bg-emerald-500 group-hover:text-white transition-all">
                   <FileEdit size={16} />
               </div>
           </div>
@@ -427,13 +429,13 @@ const CourseRow = ({ course }) => {
 };
 
 const FeedItem = ({ item }) => (
-    <div className="flex gap-4 relative pl-4 border-l border-white/5 hover:border-emerald-500/50 transition-colors group">
-        <div className="absolute left-[-2.5px] top-2 w-[5px] h-[5px] rounded-full bg-slate-700 group-hover:bg-emerald-500 transition-colors" />
+    <div className="flex gap-4 relative pl-4 border-l border-[var(--border-subtle)] hover:border-emerald-500/50 transition-colors group">
+        <div className="absolute left-[-2.5px] top-2 w-[5px] h-[5px] rounded-full bg-[var(--text-muted)] group-hover:bg-emerald-500 transition-colors" />
         <div className="flex-1">
-            <p className="text-sm text-slate-300">
-                <span className="font-bold text-white group-hover:text-emerald-400 transition-colors">{item.learner}</span> enrolled in <span className="font-medium text-white/80 border-b border-white/10">{item.course}</span>.
+            <p className="text-sm text-[var(--text-muted)]">
+                <span className="font-bold text-[var(--text-main)] group-hover:text-emerald-500 transition-colors">{item.learner}</span> enrolled in <span className="font-medium text-[var(--text-main)] border-b border-[var(--border-subtle)]">{item.course}</span>.
             </p>
-            <p className="text-[10px] font-mono text-slate-600 mt-2 uppercase">
+            <p className="text-[10px] font-mono text-[var(--text-muted)] mt-2 uppercase">
                 {new Date(item.enrolledAt).toLocaleTimeString()}
             </p>
         </div>
@@ -441,13 +443,13 @@ const FeedItem = ({ item }) => (
 );
 
 const InfoBlock = ({ title, value, subtext, icon, gradient }) => (
-    <div className={`p-6 rounded-[2rem] bg-gradient-to-br ${gradient} border border-white/5 relative overflow-hidden`}>
+    <div className={`p-6 rounded-[2rem] bg-gradient-to-br ${gradient} border border-[var(--border-subtle)] relative overflow-hidden`}>
         <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-4 text-white/80">
+            <div className="flex items-center gap-3 mb-4 text-[var(--text-main)] opacity-80">
                 {icon} <span className="text-xs font-bold uppercase tracking-widest">{title}</span>
             </div>
-            <div className="text-4xl font-black text-white tracking-tighter mb-1">{value}</div>
-            <div className="text-[10px] text-white/50 font-mono uppercase">{subtext}</div>
+            <div className="text-4xl font-black text-[var(--text-main)] tracking-tighter mb-1">{value}</div>
+            <div className="text-[10px] text-[var(--text-main)] opacity-50 font-mono uppercase">{subtext}</div>
         </div>
     </div>
 );
