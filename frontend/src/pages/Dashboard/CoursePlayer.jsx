@@ -223,13 +223,13 @@ const CoursePlayer = () => {
               </h2>
             </div>
 
-            {/* <button 
+            <button 
               onClick={() => toggleLessonStatus(currentLesson?._id)}
               className="flex items-center gap-2 px-6 py-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs font-black uppercase hover:bg-emerald-500 hover:text-white transition-all duration-300"
             >
               <CheckCircle size={18} />
               {completedLessons.includes(currentLesson?._id) ? "Marked as Done" : "Mark as Completed"}
-            </button> */}
+            </button>
           </div>
             <p className="text-slate-400 leading-relaxed text-sm font-medium border-l-2 border-slate-800 pl-6 py-2">
               {course?.description}
