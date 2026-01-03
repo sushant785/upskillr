@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import api from '../../utils/api';
 import { 
@@ -15,6 +15,7 @@ import {
 
 const CoursePlayer = () => {
   const { courseId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
   const [course, setCourse] = useState(null);
@@ -23,6 +24,8 @@ const CoursePlayer = () => {
   const [expandedSections, setExpandedSections] = useState({});
   const [completedLessons, setCompletedLessons] = useState([]); 
   const [showCelebration, setShowCelebration] = useState(false);
+  const initialLessonId = searchParams.get('lessonId'); 
+
 
   useEffect(() => {
     const fetchCourseContent = async () => {
@@ -38,7 +41,26 @@ const CoursePlayer = () => {
         setCourse(course);
         setCompletedLessons(completedLessons || []); 
 
-        if (course.sections?.length > 0) {
+        let targetLesson = null;
+        let targetSectionId = null;
+
+        // 1. Try to find the specific lesson from URL
+        if (initialLessonId) {
+          for (const section of course.sections) {
+            const found = section.lessons?.find(l => l._id === initialLessonId);
+            if (found) {
+              targetLesson = found;
+              targetSectionId = section._id;
+              break; 
+            }
+          }
+        }
+
+        // 2. If found, play it. If not, default to the very first lesson.
+        if (targetLesson) {
+          setCurrentLesson(targetLesson);
+          setExpandedSections({ [targetSectionId]: true });
+        } else if (course.sections?.length > 0) {
           const firstSection = course.sections[0];
           if (firstSection.lessons?.length > 0) {
             setCurrentLesson(firstSection.lessons[0]);
@@ -54,6 +76,16 @@ const CoursePlayer = () => {
 
     fetchCourseContent();
   }, [courseId]);
+
+
+  useEffect(() => {
+    if (courseId && currentLesson?._id) {
+      api.put('/learner/progress/mark', { 
+        courseId, 
+        lessonId: currentLesson._id 
+      }).catch(err => console.error("Failed to update bookmark:", err));
+    }
+  }, [courseId, currentLesson?._id]);
 
 
   const playNextLesson = () => {

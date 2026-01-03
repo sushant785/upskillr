@@ -1,7 +1,6 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Layers, Clock, CheckCircle, 
   PlayCircle, Loader2, AlertCircle, 
@@ -23,6 +22,7 @@ const LearnerDashboard = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setData(response.data);
+        console.log(response.data)
       } catch (err) {
         setError("Failed to initialize system overview.");
       } finally {
@@ -125,9 +125,11 @@ const LearnerDashboard = () => {
                       data.continueLearning.map((course) => (
                         <CourseItem 
                           key={course.courseId}
+                          courseId={course.courseId}
                           title={course.title} 
                           progress={course.progressPercent} 
                           thumbnail={course.thumbnail}
+                          lastLessonId={course.lastAccessedLesson}
                         />
                       ))
                     ) : (
@@ -158,6 +160,7 @@ const LearnerDashboard = () => {
 };
 
 // --- SUB-COMPONENTS ---
+
 
 const LocalNotes = () => {
   const [note, setNote] = useState(localStorage.getItem('learner_note') || "");
@@ -256,38 +259,50 @@ const PomodoroTimer = () => {
   );
 };
 
-const CourseItem = ({ title, progress, thumbnail }) => (
-  <div className="p-5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-500/30 transition-all cursor-pointer group">
-    <div className="flex items-center gap-4">
-      <div className="relative w-16 h-12 rounded-lg bg-[var(--bg-main)] overflow-hidden border border-[var(--border-subtle)]">
-        {thumbnail ? (
-          <img src={thumbnail} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-emerald-500/10 text-emerald-600">
-            <PlayCircle size={20} />
+const CourseItem = ({ title, progress, thumbnail,courseId,lastLessonId }) => {
+  const navigate = useNavigate();
+  const handleContinue = () => {
+    if(lastLessonId) {
+      navigate(`/learner/course/${courseId}/learn?lessonId=${lastLessonId}`);
+    }
+    else {
+      navigate(`/learner/course/${courseId}/learn`);
+    }
+  }
+  
+  return (
+    <div onClick={handleContinue} className="p-5 rounded-2xl bg-[var(--bg-input)] border border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-500/30 transition-all cursor-pointer group">
+      <div className="flex items-center gap-4">
+        <div className="relative w-16 h-12 rounded-lg bg-[var(--bg-main)] overflow-hidden border border-[var(--border-subtle)]">
+          {thumbnail ? (
+            <img src={thumbnail} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-emerald-500/10 text-emerald-600">
+              <PlayCircle size={20} />
+            </div>
+          )}
+        </div>
+        <div>
+          <h5 className="font-bold text-base text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{title}</h5>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[9px] font-black uppercase text-[var(--text-muted)] tracking-widest">In Progress</span>
           </div>
-        )}
-      </div>
-      <div>
-        <h5 className="font-bold text-base text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{title}</h5>
-        <div className="flex items-center gap-2 mt-1">
-           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-           <span className="text-[9px] font-black uppercase text-[var(--text-muted)] tracking-widest">In Progress</span>
         </div>
       </div>
-    </div>
-    <div className="flex items-center gap-4">
-      <div className="flex flex-col items-end gap-1">
-        <span className="text-[11px] font-black">{progress}%</span>
-        <div className="w-32 h-1.5 bg-[var(--bg-main)] rounded-full overflow-hidden border border-[var(--border-subtle)]">
-          <div className="h-full bg-emerald-500" style={{ width: `${progress}%` }}></div>
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col items-end gap-1">
+          <span className="text-[11px] font-black">{progress}%</span>
+          <div className="w-32 h-1.5 bg-[var(--bg-main)] rounded-full overflow-hidden border border-[var(--border-subtle)]">
+            <div className="h-full bg-emerald-500" style={{ width: `${progress}%` }}></div>
+          </div>
         </div>
+        <button className="p-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] group-hover:bg-emerald-500 group-hover:text-[var(--text-on-brand)] transition-all shadow-sm">
+          <PlayCircle size={20} />
+        </button>
       </div>
-      <button className="p-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] group-hover:bg-emerald-500 group-hover:text-[var(--text-on-brand)] transition-all shadow-sm">
-        <PlayCircle size={20} />
-      </button>
     </div>
-  </div>
-);
+  );
+};
 
 export default LearnerDashboard;

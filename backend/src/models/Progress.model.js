@@ -24,6 +24,12 @@ const progressSchema = new mongoose.Schema(
       default: false
     },
 
+    lastAccessedLesson: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lesson",
+      default: null,
+    },
+
     completedLessons: [
       {
         type: mongoose.Schema.Types.ObjectId,

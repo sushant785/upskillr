@@ -55,7 +55,8 @@ export const getMyEnrolledCourses = async (req, res) => {
             return {
                 ...enrollment._doc, 
                 progressPercent: percent,
-                status: percent === 100 ? 'completed' : 'in-progress'
+                status: percent === 100 ? 'completed' : 'in-progress',
+                lastAccessedLesson: progressDoc ? progressDoc.lastAccessedLesson : null
             };
         }));
         const finalCourses = coursesWithProgress.filter(c => c !== null);
@@ -245,7 +246,8 @@ export const getLearnerDashboard = async (req, res) => {
         courseId: p.course._id,
         title: p.course.title,
         thumbnail: p.course.thumbnail,
-        progressPercent: p.progressPercent
+        progressPercent: p.progressPercent,
+        lastAccessedLesson: p.lastAccessedLesson
       }))
     });
 
@@ -254,3 +256,31 @@ export const getLearnerDashboard = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch learner dashboard" });
   }
 };
+
+
+export const updateLastAccessed = async (req,res) => {
+  try {
+    const {courseId , lessonId} = req.body;
+    const userId = req.user._id;
+
+    if(!courseId || !lessonId) {
+      return res.status(404).json({message:"course and lesson id are required"});
+    }
+
+    const updatedProgress = await Progress.findOneAndUpdate(
+      {user:userId,course:courseId},
+      {$set: {lastAccessedLesson: lessonId}},
+      {upsert:true , new:true}
+    )
+    
+    if (!updatedProgress) {
+      return res.status(404).json({ message: "Progress record not found. Is user enrolled?" });
+    }
+
+    res.status(200).json({ message: "Progress marker updated" });
+  }
+  catch(err) {
+    console.error(err);
+    res.status(500).json({message : "Failed to update marker"})
+  }
+}

@@ -14,10 +14,9 @@ const MyCourses = () => {
   const fetchMyCourses = async () => {
     setLoading(true); 
     try {
-      
       const response = await api.get('/learner/my-courses'); 
-      
       setEnrollments(response.data.courses || []);
+      console.log(response)
     } catch (err) {
       console.error("Error fetching my courses:", err);
     } finally {
@@ -30,9 +29,12 @@ const MyCourses = () => {
 
 
 
-  const handleContinueBtn = (courseId) => {
-      console.log(`Continuing course: ${courseId}`);
-      navigate(`/learner/course/${courseId}/learn`);
+  const handleContinueBtn = (courseId, lessonId) => {
+      if (lessonId) {
+        navigate(`/learner/course/${courseId}/learn?lessonId=${lessonId}`);
+    } else {
+        navigate(`/learner/course/${courseId}/learn`);
+    }
   }
 
   if (loading) {
@@ -124,7 +126,7 @@ const MyCourses = () => {
 
 {/* --- Action Button --- */}
 <button 
-    onClick={() => handleContinueBtn(course._id)}
+    onClick={() => handleContinueBtn(course._id,item.lastAccessedLesson)}
     className="w-full py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all active:scale-95 flex items-center justify-center gap-2"
 >
     <PlayCircle size={18} fill="currentColor" />

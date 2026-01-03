@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllCourses, getMyEnrolledCourses, enrollInCourse, getCourseLessons, getCourseDetails,updateLessonProgress, getLearnerDashboard } from "../controllers/learner.controller.js";
+import { getAllCourses, getMyEnrolledCourses, enrollInCourse, getCourseLessons, getCourseDetails,updateLessonProgress, getLearnerDashboard, updateLastAccessed } from "../controllers/learner.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -11,5 +11,6 @@ router.post("/update-progress", protect, updateLessonProgress);
 router.get("/course/:courseId", protect, getCourseDetails);
 router.get("/course/:courseId/lessons", protect, getCourseLessons);
 router.get("/dashboard",protect,getLearnerDashboard);
+router.put("/progress/mark",protect,updateLastAccessed);
 
 export default router;
