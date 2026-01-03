@@ -22,7 +22,7 @@
   --bg-input: rgba(15, 23, 42, 0.5); /* Slate 900 with opacity */
   
   /* Borders & Text */
-  --border-subtle: #1e293b;    /* Slate 800 */
+  --border-subtle: #334155;    /* Slate 800 */
   --text-muted: #94a3b8;       /* Slate 400 */
   --text-on-brand: #064e3b;    /* Emerald 950 (for buttons) */
   --text-main: #e2e8f0;       /* Slate 200 */
@@ -36,7 +36,7 @@
   --bg-main: #f8fafc;           /* Cleaner light slate */
   --bg-card: #ffffff;           /* Solid white for cards */
   --bg-input: #f1f5f9;          /* Subtle gray for inputs */
-  --border-subtle: #e2e8f0;     /* Soft border */
+  --border-subtle: #cbd5e1;     /* Soft border */
   --text-main: #0f172a;         /* Deep navy text */
   --text-layout: #1e293b;       /* Darker slate for layout */
   --text-muted: #64748b;        

@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react'; 
+import axios from 'axios';
+import { useAuth } from './context/AuthContext.jsx';
+
 import Login from './pages/Login.jsx';
 import LearnerDashboard from './pages/Dashboard/LearnerDashboard.jsx';
 import Profile from './pages/Profile.jsx';
@@ -20,7 +24,52 @@ import Progress from './pages/Progress.jsx';
 import Enrollments from './pages/Instructor/Enrollments.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 
+
 function App() {
+
+  const { setAuth } = useAuth(); 
+  const [isLoading, setIsLoading] = useState(true); 
+
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        
+        const response = await axios.get("http://localhost:5000/api/auth/refresh", {
+          withCredentials: true 
+        });
+
+        
+        setAuth({
+          user: response.data.user,
+          accessToken: response.data.accessToken,
+          role: response.data.user.role 
+        });
+
+        console.log("Session restored for:", response.data.user.email);
+
+      } catch (err) {
+        console.log("No active session");
+        
+        setAuth({ user: null, accessToken: null, role: null });
+      } finally {
+        
+        setIsLoading(false);
+      }
+    };
+
+    verifySession();
+  }, []); 
+
+  // 4. Show Loading Screen while checking
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
+        Loading...
+      </div>
+    );
+  }
+
+
   return (
     <Router>
       <Routes>
@@ -38,7 +87,7 @@ function App() {
             <Route path="/learner/dashboard" element={<LearnerDashboard />} />
             <Route path="/learner/browse" element={<BrowseCourses />} /> 
             <Route path="/learner/my-courses" element={<MyCourses />} /> 
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/learner/profile" element={<Profile />} />
             <Route path="/learner/progress" element={<Progress />} />
             <Route path="/learner/course/:courseId/review" element={<CourseReview />} />
             
@@ -53,6 +102,7 @@ function App() {
             <Route path="/instructor/course/:courseId/manage" element={<CourseBuilder />} />
             <Route path="/instructor/courses" element={<InstructorCourses />} />
             <Route path="/instructor/enrollments" element={<Enrollments />}/>
+            <Route path="/instructor/profile" element={<Profile />} />
           </Route>
         </Route>
 

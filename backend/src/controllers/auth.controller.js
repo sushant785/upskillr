@@ -92,7 +92,7 @@ export const login = async (req, res) => {
 
 //    REFRESH ACCESS TOKEN
 
-export const refreshToken = (req, res) => {
+export const refreshToken = async (req, res) => {
   const token = req.cookies.refreshToken;
 
   if (!token) {
@@ -105,12 +105,25 @@ export const refreshToken = (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
 
+    const user = await User.findById(decoded._id); 
+    if (!user) {
+      return res.status(403).json({ message: "User not found" });
+    }
+
     const newAccessToken = generateAccessToken({
-      _id: decoded._id,
-      role: decoded.role
+      _id: user._id,
+      role: user.role
     });
 
-    res.json({ accessToken: newAccessToken });
+    res.json({ 
+      accessToken: newAccessToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+     });
 
   } catch (err) {
     return res.status(403).json({ message: "Invalid refresh token" });
@@ -121,6 +134,11 @@ export const refreshToken = (req, res) => {
 //    LOGOUT
 
 export const logout = (req, res) => {
-  res.clearCookie("refreshToken");
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false, 
+    sameSite: "lax", 
+  });
+  
   res.json({ message: "Logged out successfully" });
 };

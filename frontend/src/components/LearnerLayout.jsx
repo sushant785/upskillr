@@ -3,29 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import LearnerSidebar from './sidebar/LearnerSidebar';
 import { Menu, Bell, BrainCircuit } from 'lucide-react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const LearnerLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); 
   const [userData, setUserData] = useState(null);
+  const {auth} = useAuth();
+  console.log(auth)
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const auth = JSON.parse(localStorage.getItem('auth'));
-      const { data } = await axios.get('http://localhost:5000/api/profile', {
-        headers: { Authorization: `Bearer ${auth?.token}` },
-        withCredentials: true
-      }); 
-      setUserData(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-['Poppins'] flex overflow-hidden">
@@ -71,7 +57,7 @@ const LearnerLayout = () => {
             <div className="flex items-center gap-3 pl-3 md:pl-6 border-l border-[var(--border-subtle)]">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-black text-[var(--text-main)] uppercase tracking-tight">
-                  {userData?.name || "Learner"}
+                  {auth.user.name || "Learner"}
                 </p>
                 <p className="text-[9px] text-emerald-600 font-black uppercase tracking-widest">
                   Level 12
