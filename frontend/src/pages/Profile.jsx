@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Shield, Edit3, Save, Loader2, Eye, EyeOff, Lock } from 'lucide-react';
 import axios from 'axios';
+import { useToast } from '../context/ToastContext';
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState(null);
@@ -16,6 +17,7 @@ const ProfilePage = () => {
 
   const [name, setName] = useState('');
   const [passwords, setPasswords] = useState({ oldPassword: '', newPassword: '' });
+  const toast = useToast();
 
   useEffect(() => {
     fetchProfile();
@@ -34,6 +36,7 @@ const ProfilePage = () => {
       setBio(localBio);
     } catch (err) {
       console.error("Failed to fetch profile", err);
+      toast.error("Failed to load profile data.");
     } finally {
       setLoading(false);
     }
@@ -51,12 +54,15 @@ const ProfilePage = () => {
       if (type === 'name') {
         setUserData({ ...userData, name });
         setIsEditingName(false);
+        toast.success("Profile name updated!");
       } else {
         setIsEditingPass(false);
         setPasswords({ oldPassword: '', newPassword: '' });
+        toast.success("Password changed successfully.");
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Update failed.");
+      const errorMsg = err.response?.data?.message || "Update failed.";
+      toast.error(errorMsg);
     } finally {
       setUpdateLoading(false);
     }
@@ -69,6 +75,7 @@ const ProfilePage = () => {
       setUserData(prev => ({ ...prev, bio: bio }));
       setIsEditingBio(false);
       setUpdateLoading(false);
+      toast.success("Bio updated successfully")
     }, 400);
   };
 

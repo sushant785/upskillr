@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { Search, Filter, Star, Clock, Users, PlayCircle , Info} from 'lucide-react';
+import {useToast} from "../../context/ToastContext"
 
 const BrowseCourses = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const BrowseCourses = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-
+  const toast = useToast();
 
 
   const categories = ['All', 'Development', 'Design', 'Business', 'Marketing', 'Data Science'];
@@ -23,6 +24,7 @@ const BrowseCourses = () => {
       setCourses(response.data.courses || []);
     } catch (err) {
       console.error("Error fetching courses:", err);
+      toast.error("Failed to load course catalog.");
     } finally {
       setLoading(false);
     }
@@ -34,15 +36,17 @@ const BrowseCourses = () => {
 const handleEnroll = async (courseId) => {
   try {
     await api.post('/learner/enroll', { courseId });
-    alert("Enrolled successfully! Check your My Courses tab.");
+    toast.success("Enrolled successfully! Check your My Courses tab.");
   } catch (err) {
-    alert(err.response?.data?.message || "Enrollment failed");
+    const msg = err.response?.data?.message || "Enrollment failed";
+    if (msg.includes("already enrolled")) {
+          toast.info("You are already enrolled in this course.");
+      } else {
+          toast.error(msg);
+      }
   }
 };
-
-  
-
-  // Filter logic for search and category chips
+// Filter logic for search and category chips
   const filteredCourses = courses.filter(course => {
   const matchesSearch = course.title?.toLowerCase().includes(searchQuery.toLowerCase());
   const matchesCategory = selectedCategory === 'All' || course.category?.toLowerCase() === selectedCategory.toLowerCase(); // Case-insensitive

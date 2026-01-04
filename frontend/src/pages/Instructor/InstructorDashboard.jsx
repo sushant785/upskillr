@@ -7,6 +7,8 @@ import {
   CheckCircle2, Zap, ArrowUpRight, FileEdit,
   LayoutGrid, Sparkles, TrendingUp, Cpu, BookOpen
 } from 'lucide-react';
+import api from '../../utils/api';
+import { useToast } from '../../context/ToastContext';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -48,9 +50,8 @@ const InstructorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeGreeting, setTimeGreeting] = useState("");
-  
-  // 2. Initialize Navigation Hook
   const navigate = useNavigate(); 
+  const toast = useToast();
 
   // --- LOGIC: Greeting based on time ---
   useEffect(() => {
@@ -60,35 +61,16 @@ const InstructorDashboard = () => {
     else setTimeGreeting("Good Evening, Instructor.");
   }, []);
 
-  // --- API FETCH LOGIC ---
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const authString = localStorage.getItem('auth');
-        if (!authString) throw new Error("Authentication missing. Please login.");
-
-        const authData = JSON.parse(authString);
-        const token = authData.token; 
-        if (!token) throw new Error("Session expired.");
-
-        const response = await fetch('http://localhost:5000/api/instructor/dashboard', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({})); 
-            throw new Error(errorData.message || `Server Error: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setDashboardData(data);
+        const response = await api.get('/instructor/dashboard')
+        setDashboardData(response.data);
       } catch (err) {
         console.error("Dashboard Sync Failed:", err);
-        setError(err.message);
+        const errorMsg = err.response?.data?.message || "Failed to load dashboard data";
+        setError(errorMsg);
+        toast.error(errorMsg);
       } finally {
         setLoading(false);
       }

@@ -12,11 +12,13 @@ import {
   Loader2,
   X
 } from 'lucide-react';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const CreateCourse = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const toast = useToast();
   
   const [formData, setFormData] = useState({
     title: '',
@@ -46,6 +48,12 @@ const CreateCourse = () => {
 
   const handleSubmit = async (e) => {
       e.preventDefault();
+
+      if (!formData.title || !formData.category || !formData.price) {
+          toast.warning("Please fill in all required fields.");
+          return;
+      }
+
       setLoading(true);
 
       try {
@@ -62,14 +70,17 @@ const CreateCourse = () => {
         const response = await api.post('/instructor/courses', data)
 
         if (response.data && response.data.course) {
+          toast.success("Course draft created! Let's build the content.");
           const newCourseId = response.data.course._id;
-
-          navigate(`/instructor/course/${newCourseId}/manage`);
+          setTimeout(() => {
+             navigate(`/instructor/course/${newCourseId}/manage`);
+          }, 1000);
         }
 
       } catch (error) {
         console.error("Creation failed:", error);
-        alert(error.response?.data?.message || "Error creating course");
+        const errorMsg = "Failed to create course.";
+        toast.error(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -95,7 +106,7 @@ const CreateCourse = () => {
       </motion.div>
 
       {/* --- MAIN FORM --- */}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10"> 
           
           {/* LEFT COLUMN: Course Details */}

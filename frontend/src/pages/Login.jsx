@@ -6,6 +6,7 @@ import { User, Mail, Lock, GraduationCap, Presentation, ArrowRight, Sparkles,Bra
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const UpskillrAuth = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -16,6 +17,7 @@ const UpskillrAuth = () => {
   const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
   const { setAuth, auth } = useAuth();
+  const toast = useToast();
 
   useEffect(() => {
     if (auth?.accessToken && auth?.user) {
@@ -47,10 +49,15 @@ const UpskillrAuth = () => {
             user: response.data.user
           }));
 
+          if(isLogin) toast.success(`Welcome back, ${response.data.user.name.split(' ')[0]}!`)
+          else toast.success("Account created successfully! Welcome aboard.");
+
           navigate(response.data.user.role === 'learner' ? '/learner/dashboard' : '/instructor/dashboard');
         }
     } catch (err) {
-        alert(err.response?.data?.message || "Authentication failed");
+        console.error("Auth Error:", err);
+        const errorMessage = "Authentication failed. Please try again.";
+        toast.error(errorMessage);
     }
   };
 

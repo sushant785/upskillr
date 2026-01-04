@@ -6,11 +6,13 @@ import { NavLink,useNavigate } from 'react-router-dom';
 import { BrainCircuit, X, Settings, LogOut, Sun, Moon, ChevronRight } from 'lucide-react';
 import axios from 'axios'; 
 import { useAuth } from '../../context/AuthContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const SidebarBase = ({ navItems, isOpen, toggleSidebar }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   const menuRef = useRef(null);
+  const toast = useToast();
 
   const { setAuth } = useAuth(); 
   const navigate = useNavigate();
@@ -24,12 +26,13 @@ const handleLogout = async () => {
 
       // 2. Clear app state
       setAuth({ user: null, accessToken: null, role: null });
-
+      toast.success("Successfully logged out")
       // 3. Go to login page
       navigate("/");
       
     } catch (error) {
       console.error("Logout failed", error);
+      toast.error("Failed to logout")
     }
   };
 

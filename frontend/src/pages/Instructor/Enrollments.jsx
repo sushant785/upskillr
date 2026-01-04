@@ -1,6 +1,7 @@
 import React, {useState,useEffect} from 'react';
 import {Search,Loader2,User,Mail,BarChart,Trophy,BookOpen,Calendar,ArrowUpDown,ArrowUp,ArrowDown,ChevronLeft,ChevronRight} from 'lucide-react';
 import api from '../../utils/api.js'
+import {useToast} from "../../context/ToastContext.jsx"
 
 const Enrollments = () => {
 
@@ -10,6 +11,7 @@ const Enrollments = () => {
     const [sortConfig, setSortConfig] = useState({ key: 'enrolledAt', direction: 'desc' });
     const [selectedCourse, setSelectedCourse] = useState("all");
     const [currentPage,setCurrentPage] = useState(1);
+    const toast = useToast();
     
     const itemsPerPage = 10;
 
@@ -22,6 +24,7 @@ const Enrollments = () => {
             }
             catch(err) {
                 console.error("Failed",err)
+                toast.error("Failed to load student enrollments.");
             } finally {
                 setLoading(false);
             }

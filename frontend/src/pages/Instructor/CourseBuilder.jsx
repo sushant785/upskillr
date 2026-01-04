@@ -5,15 +5,16 @@ import {
   Plus, PlayCircle, FileText, 
   Trash2, GripVertical, 
   ChevronDown, ChevronRight, Save,
-  Video, Globe, Loader2, X, Paperclip
+  Video, Globe, Loader2, X, Paperclip, AlertTriangle
 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import axios from 'axios'; 
 import api from '../../utils/api'; 
+import { useToast } from '../../context/ToastContext';
 
 const CourseBuilder = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('curriculum');
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,13 @@ const CourseBuilder = () => {
     title: '', 
     video: null, 
     resource: null 
+  });
+
+  const [deleteModal, setDeleteModal] = useState({ 
+    isOpen: false, 
+    type: null,    // 'course', 'section', or 'lesson'
+    id: null,      // The ID of the item to delete
+    parentId: null // Only needed for lessons (to know which section it belongs to)
   });
 
   useEffect(() => {
@@ -65,15 +73,15 @@ const CourseBuilder = () => {
   // --- HANDLE LESSON UPLOAD (MATCHING YOUR BACKEND) ---
   const handleUploadLesson = async () => {
     if (!lessonForm.title || !lessonForm.video) {
-      return toast.error("Title and Video are required");
+      return toast.warning("Title and Video are required");
     }
 
     if (!lessonForm.resource) {
-       return toast.error("Attachment/Resource is required by backend");
+       return toast.warning("Attachment/Resource is required by backend");
     }
 
     setUploading(true);
-    const toastId = toast.loading("Initializing upload...");
+    toast.info("Starting upload... please wait.");
 
     try {
 
@@ -88,7 +96,7 @@ const CourseBuilder = () => {
         fileTypeMain: lessonForm.video.type,  
         fileTypeResource: lessonForm.resource.type 
       });
-      toast.loading("Uploading files to S3...", { id: toastId });     
+
       const uploadPromises = []; 
       if (data.uploadUrlMain && lessonForm.video) {
         uploadPromises.push(
@@ -123,13 +131,14 @@ const CourseBuilder = () => {
         return sec;
       }));
 
-      toast.success("Lesson created successfully!", { id: toastId });
+      toast.success("Lesson uploaded successfully!");
+
       setIsAddingLesson(false);
       setLessonForm({ title: '', video: null, resource: null });
 
     } catch (error) {
       console.error("Upload Error:", error);
-      toast.error(error.response?.data?.message || "Upload failed", { id: toastId });
+      toast.error(error.response?.data?.message || "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -141,21 +150,14 @@ const CourseBuilder = () => {
     try {
       const { data } = await api.patch(`/instructor/courses/${courseId}/publish`);
       setCourse(prev => ({ ...prev, isPublished: !prev.isPublished }));
-      toast.success(data.message);
+      toast.success(course.isPublished ? "Course reverted to draft." : "Course is now LIVE!");
     } catch (error) {
       toast.error("Failed to update status");
     }
   };
 
   const handleDeleteCourse = async () => {
-    if (!window.confirm("Are you sure? This will delete all lessons and sections.")) return;
-    try {
-      await api.delete(`/instructor/courses/${courseId}`);
-      toast.success("Course deleted");
-      navigate('/instructor/dashboard');
-    } catch (error) {
-      toast.error("Delete failed");
-    }
+    setDeleteModal({ isOpen: true, type: 'course', id: courseId, parentId: null });
   };
 
   const handleUpdateSettings = async (e) => {
@@ -193,32 +195,49 @@ const CourseBuilder = () => {
   };
 
   const handleDeleteSection = async (sectionId) => {
-    if (!window.confirm("Delete this module and all its lessons?")) return;
-    try {
-      await api.delete(`/instructor/courses/${courseId}/sections/${sectionId}`);
-      setSections(sections.filter(sec => sec._id !== sectionId));
-      toast.success("Module deleted");
-    } catch (error) {
-      toast.error("Failed to delete module");
-    }
+    setDeleteModal({ isOpen: true, type: 'section', id: sectionId, parentId: null });
   };
 
   const handleDeleteLesson = async (lessonId, sectionId) => {
-    if (!window.confirm("Delete this lesson?")) return;
-    try {
-      await api.delete(`/instructor/videos/${lessonId}`);
-      setSections(prev => prev.map(sec => {
-        if (sec._id === sectionId) {
-            return { ...sec, lessons: sec.lessons.filter(l => l._id !== lessonId) };
-        }
-        return sec;
-      }));
-      toast.success("Lesson deleted");
-    } catch (error) {
-      toast.error("Delete failed");
-    }
+    setDeleteModal({ isOpen: true, type: 'lesson', id: lessonId, parentId: sectionId });
   };
 
+  const handleConfirmDelete = async () => {
+    const { type, id, parentId } = deleteModal;
+    setDeleteModal(prev => ({ ...prev, isOpen: false }));
+
+    try {
+      // --- CASE A: DELETE COURSE ---
+      if (type === 'course') {
+        await api.delete(`/instructor/courses/${id}`);
+        toast.success("Course deleted successfully.");
+        navigate('/instructor/dashboard');
+      } 
+      
+      // --- CASE B: DELETE SECTION ---
+      else if (type === 'section') {
+        await api.delete(`/instructor/courses/${courseId}/sections/${id}`);
+        setSections(prev => prev.filter(sec => sec._id !== id));
+        toast.success("Module deleted.");
+      } 
+      
+      // --- CASE C: DELETE LESSON ---
+      else if (type === 'lesson') {
+        await api.delete(`/instructor/videos/${id}`);
+        setSections(prev => prev.map(sec => {
+          if (sec._id === parentId) {
+            return { ...sec, lessons: sec.lessons.filter(l => l._id !== id) };
+          }
+          return sec;
+        }));
+        toast.success("Lesson deleted.");
+      }
+
+    } catch (error) {
+      console.error(error);
+      toast.error(`Failed to delete ${type}`);
+    }
+  };
 
   // --- RENDER ---
   if (loading) return (
@@ -323,7 +342,7 @@ const CourseBuilder = () => {
       {/* --- SETTINGS TAB --- */}
       {activeTab === 'settings' && (
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="max-w-3xl">
-            <form onSubmit={handleUpdateSettings} className="space-y-8 bg-[var(--bg-card)] border border-[var(--border-subtle)] p-8 rounded-[2rem] shadow-sm">
+            <form onSubmit={handleUpdateSettings} noValidate className="space-y-8 bg-[var(--bg-card)] border border-[var(--border-subtle)] p-8 rounded-[2rem] shadow-sm">
                 <div className="space-y-4">
                     <label className="text-xs font-black text-[var(--text-muted)] uppercase">Course Title</label>
                     <input name="title" defaultValue={course.title} className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl p-4 text-[var(--text-main)] focus:outline-none focus:border-emerald-500 transition-colors" />
@@ -438,6 +457,53 @@ const CourseBuilder = () => {
         </div>
       )}
     </div>
+
+    {/* --- DELETE CONFIRMATION MODAL --- */}
+    <AnimatePresence>
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0 }} 
+            animate={{ scale: 1, opacity: 1 }} 
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-[var(--bg-card)] border border-red-500/30 rounded-3xl p-8 w-full max-w-md shadow-2xl relative overflow-hidden"
+          >
+            {/* Red Glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-[50px] rounded-full pointer-events-none"></div>
+
+            <div className="relative z-10 text-center">
+              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20 mb-6 mx-auto">
+                <AlertTriangle size={32} className="text-red-500" />
+              </div>
+
+              <h3 className="text-2xl font-black text-[var(--text-main)] mb-2 capitalize">
+                Delete {deleteModal.type}?
+              </h3>
+              
+              <p className="text-[var(--text-muted)] text-sm mb-8">
+                Are you sure you want to remove this <span className="text-red-500 font-bold uppercase">{deleteModal.type}</span>? 
+                This action cannot be undone.
+              </p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <button 
+                  onClick={() => setDeleteModal(prev => ({ ...prev, isOpen: false }))}
+                  className="py-3 rounded-xl bg-[var(--bg-input)] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-main)] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmDelete}
+                  className="py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 shadow-lg shadow-red-500/20 transition-all active:scale-95"
+                >
+                  Yes, Delete
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
     </div>
   );
 };
