@@ -11,8 +11,7 @@
   /* --- TYPOGRAPHY --- */
   --font-poppins: 'Poppins', sans-serif !important;
 
-  /* --- DEFAULT THEME (DARK / BLACK GLASS) --- */
-  /* These match your original hardcoded "bg-white/5", "bg-black/20", etc. */
+  
   
   /* Backgrounds */
   --bg-main: #020617;                   /* Slate 950 */
@@ -29,7 +28,7 @@
 }
 
 [data-theme='light'] {
-  /* --- LIGHT THEME OVERRIDES --- */
+  
   
   /* Backgrounds */
   --bg-main: #f8fafc;         /* Slate 50 */
@@ -48,7 +47,7 @@
   --brand-primary-hover: #059669; /* Darker Emerald for light mode hover */
 }
 
-/* --- GLOBAL RESETS --- */
+
 * {
   font-family: var(--font-poppins);
 }
@@ -57,6 +56,6 @@ body {
   font-family: var(--font-poppins);
   background-color: var(--bg-main);
   color: var(--text-main);
-  /* Smooth transition when toggling themes */
+  
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
