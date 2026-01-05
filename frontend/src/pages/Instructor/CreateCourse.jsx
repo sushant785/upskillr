@@ -87,9 +87,15 @@ const CreateCourse = () => {
     };
 
   return (
-    // Root container uses bg-main
-    <div className="w-full min-h-screen bg-[var(--bg-main)] transition-colors duration-300 font-['Poppins']">
-        <div className="max-w-7xl mx-auto p-6 md:p-12 text-[var(--text-main)]">
+    // Root container uses bg-main with relative positioning for ambient effects
+    <div className="w-full min-h-screen bg-[var(--bg-main)] transition-colors duration-300 font-['Poppins'] relative overflow-hidden">
+        
+        {/* --- AMBIENT BACKGROUNDS --- */}
+        <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none animate-pulse" />
+        <div className="fixed bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
+
+        {/* --- MAIN CONTENT WRAPPER (z-10 to sit above backgrounds) --- */}
+        <div className="relative z-10 max-w-7xl mx-auto p-6 md:p-12 text-[var(--text-main)]">
       
       {/* --- HEADER --- */}
       <motion.div 
@@ -119,7 +125,7 @@ const CreateCourse = () => {
             {/* CARD: Uses bg-card */}
             <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-[2rem] p-8 md:p-10 space-y-8 relative overflow-hidden backdrop-blur-sm shadow-sm">
               
-              {/* Decorative Blur */}
+              {/* Decorative Blur inside card */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none"></div>
 
               {/* Title Input */}

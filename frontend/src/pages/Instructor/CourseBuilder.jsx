@@ -241,19 +241,30 @@ const CourseBuilder = () => {
 
   // --- RENDER ---
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300">
-        <Loader2 className="animate-spin text-emerald-500" size={40} />
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300 relative overflow-hidden">
+         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-900/20 via-transparent to-transparent animate-pulse" />
+        <Loader2 className="animate-spin text-emerald-500 relative z-10" size={40} />
     </div>
   );
 
   if (!course) return <div className="text-[var(--text-main)] text-center mt-20">Course Not Found</div>;
 
   return (
-    <div className="w-full min-h-screen bg-[var(--bg-main)] transition-colors duration-300 font-['Poppins']">
-        <div className="max-w-7xl mx-auto p-6 md:p-12 text-[var(--text-main)]">
+    <div className="w-full min-h-screen bg-[var(--bg-main)] transition-colors duration-300 font-['Poppins'] relative overflow-hidden">
+        
+        {/* --- AMBIENT BACKGROUNDS --- */}
+        <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none animate-pulse" />
+        <div className="fixed bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
+
+        {/* --- CONTENT WRAPPER --- */}
+        <div className="relative z-10 max-w-7xl mx-auto p-6 md:p-12 text-[var(--text-main)]">
       
       {/* HEADER */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-[var(--border-subtle)] pb-8">
+      <motion.header 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-[var(--border-subtle)] pb-8"
+      >
         <div>
           <div className="flex items-center gap-3 mb-2">
             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${course.isPublished ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'}`}>
@@ -272,7 +283,7 @@ const CourseBuilder = () => {
                 <Globe size={18} /> {course.isPublished ? 'Unpublish' : 'Publish Course'}
             </button>
         </div>
-      </header>
+      </motion.header>
 
       {/* TABS */}
       <div className="flex gap-8 mb-8 border-b border-[var(--border-subtle)] text-sm font-bold text-[var(--text-muted)]">
@@ -299,7 +310,7 @@ const CourseBuilder = () => {
                   <div className="flex items-center gap-3">
                     <button onClick={() => handleDeleteSection(section._id)} className="p-2 hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500 rounded-lg"><Trash2 size={16} /></button>
                     <button onClick={() => setExpandedModules(p => ({...p, [section._id]: !p[section._id]}))} className="p-2 hover:bg-[var(--bg-input)] rounded-lg text-[var(--text-muted)]">
-                       {expandedModules[section._id] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                        {expandedModules[section._id] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                     </button>
                   </div>
                 </div>
@@ -370,7 +381,7 @@ const CourseBuilder = () => {
                 <div className="space-y-4">
                     <label className="text-xs font-black text-[var(--text-muted)] uppercase">Thumbnail</label>
                     <div className="flex items-center gap-4">
-                         {course.thumbnail && course.thumbnail.length > 0 ? (
+                          {course.thumbnail && course.thumbnail.length > 0 ? (
                             <img src={course.thumbnail} alt="preview" className="w-32 h-20 object-cover rounded-lg border border-[var(--border-subtle)]" />
                         ) : (
                             <div className="w-32 h-20 bg-[var(--bg-input)] rounded-lg border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-muted)] text-xs">No Image</div>
