@@ -67,7 +67,9 @@ const MyCourses = () => {
           {enrollments.map((item) => {
             const { course, progressPercent, status } = item;
             return (
-            <div key={item._id} className="group flex flex-col bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2rem] overflow-hidden hover:border-emerald-500/60 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all duration-300">
+            <div key={item._id} className="group relative bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden 
+             transition-all duration-500 flex flex-col hover:border-emerald-500/50 
+             hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:-translate-y-1">
               
               {/* Thumbnail Section */}
               <div className="relative h-48 overflow-hidden bg-slate-800">

@@ -101,7 +101,9 @@ const handleEnroll = async (courseId) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredCourses.map((course) => (
-            <div key={course._id} className="group bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden hover:border-[var(--brand-primary)] transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] flex flex-col">
+            <div key={course._id} className="group relative bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden 
+             transition-all duration-500 flex flex-col hover:border-emerald-500/50 
+             hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:-translate-y-1">
   
   {/* Thumbnail */}
   <div 
