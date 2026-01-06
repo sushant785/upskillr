@@ -1,27 +1,64 @@
 import Review from '../models/Review.model.js'
 import mongoose from "mongoose";
+import CourseModel from "../models/Course.model.js";
 
-export const postReview = async (req,res) => {
-    const {user , course , rating, comment} = req.body 
-    if (!user || !course || !rating) {
-      return res.status(400).json({
-        message: "user, course and rating are required"
-      });
-    }
-    try{
-        let review = await Review.create({user , course , rating , comment})
-        console.log(review)
-        return res.status(200).json({
-            message: "Review saved successfully",
-            review
-        });
-    }catch(err){
-        console.log(err)
-        return res.status(500).json({
-            "message":"Cannot submit review"
-        })
-    }
-}
+
+export const postReview = async (req, res) => {
+  const { user, course, rating, comment } = req.body;
+
+  if (!user || !course || !rating) {
+    return res.status(400).json({
+      message: "user, course and rating are required",
+    });
+  }
+
+  try {
+    // 1️⃣ Create review
+    const review = await Review.create({
+      user,
+      course,
+      rating,
+      comment,
+    });
+
+    // 2️⃣ Get current course data
+    const courseDoc = await CourseModel.findById(course).select(
+      "averageRating totalReviews"
+    );
+
+    const oldTotal = courseDoc.totalReviews || 0;
+    const oldAvg = courseDoc.averageRating || 0;
+
+    // 3️⃣ Calculate new average
+    const newTotal = oldTotal + 1;
+    const newAvg =
+      ((oldAvg * oldTotal) + rating) / newTotal;
+
+    // 4️⃣ Update course
+    await CourseModel.updateOne(
+      { _id: course },
+      {
+        $set: {
+          averageRating: Number(newAvg.toFixed(1)),
+        },
+        $inc: {
+          totalReviews: 1,
+        },
+      }
+    );
+
+    return res.status(200).json({
+      message: "Review saved successfully",
+      review,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Cannot submit review",
+    });
+  }
+};
+
 
 export const getReview = async (req,res) =>{
     console.log("HIT getReview API");
