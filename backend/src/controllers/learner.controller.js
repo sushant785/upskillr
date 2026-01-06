@@ -102,6 +102,10 @@ export const enrollInCourse = async (req, res) => {
             completedLessons: []
         });
 
+        await Course.findByIdAndUpdate(courseId, {
+          $inc: {studentCount:1}
+        })
+
         res.status(201).json({ message: "Enrolled successfully", enrollment });
 
     } catch (err) {
@@ -237,12 +241,14 @@ export const getLearnerDashboard = async (req, res) => {
       .limit(3)
       .populate("course", "title thumbnail");
 
+    const validContinueLearning = continueLearning.filter(p => p.course != null);
+
     res.status(200).json({
       role: "learner",
       enrolledCourses,
       ongoingCourses,
       completedCourses,
-      continueLearning: continueLearning.map((p) => ({
+      continueLearning: validContinueLearning.map((p) => ({
         courseId: p.course._id,
         title: p.course.title,
         thumbnail: p.course.thumbnail,

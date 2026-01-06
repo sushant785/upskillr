@@ -263,6 +263,8 @@ export const getCourseEnrollments = async (req, res) => {
             ])
         ]);
 
+        const validEnrollments = enrollments.filter(e => e.user && e.course);
+
         const lessonCountMap = {};
         lessonCounts.forEach(item => {
             lessonCountMap[item._id.toString()] = item.count;
@@ -274,7 +276,7 @@ export const getCourseEnrollments = async (req, res) => {
             progressMap[key] = p;
         })
 
-        const learners = enrollments.map(e => {
+        const learners = validEnrollments.map(e => {
             const userId = e.user._id.toString();
             const courseId = e.course._id.toString();
 

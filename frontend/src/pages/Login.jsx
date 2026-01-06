@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 const UpskillrAuth = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [role, setRole] = useState('learner');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,21 +38,28 @@ const UpskillrAuth = () => {
         });
 
         if (response.status === 200 || response.status === 201) {
-          setAuth({
-            user: response.data.user,
-            accessToken: response.data.accessToken,
-            role: response.data.user.role
-          });
-          
-          localStorage.setItem('auth', JSON.stringify({
-            token: response.data.accessToken,
-            user: response.data.user
-          }));
+          if(isLogin)
+          {
+            setAuth({
+              user: response.data.user,
+              accessToken: response.data.accessToken,
+              role: response.data.user.role
+            });
+            
+            localStorage.setItem('auth', JSON.stringify({
+              token: response.data.accessToken,
+              user: response.data.user
+            }));
 
-          if(isLogin) toast.success(`Welcome back, ${response.data.user.name.split(' ')[0]}!`)
-          else toast.success("Account created successfully! Welcome aboard.");
-
-          navigate(response.data.user.role === 'learner' ? '/learner/dashboard' : '/instructor/dashboard');
+            toast.success(`Welcome back, ${response.data.user.name.split(' ')[0]}!`)
+            navigate(response.data.user.role === 'learner' ? '/learner/dashboard' : '/instructor/dashboard');
+          }
+          else
+          {
+            toast.success("Account created successfully! Please Log in.");
+            setIsLogin(true);
+            setPassword('');
+          }
         }
     } catch (err) {
         console.error("Auth Error:", err);
@@ -145,7 +152,7 @@ const UpskillrAuth = () => {
               )}
                         
               <InputField label="Secure Email" type="email" placeholder="alex@nexus.com" icon={<Mail size={16} />} value={email} onChange={(e) => setEmail(e.target.value)} />  
-              <InputField label="Access Key" type="password" placeholder="••••••••" icon={<Lock size={16} />} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <InputField label="Password" type="password" placeholder="••••••••" icon={<Lock size={16} />} value={password} onChange={(e) => setPassword(e.target.value)} />
               
               <button className="w-full bg-emerald-500 text-white py-3.5 md:py-4 rounded-xl font-black text-s md:text-sm hover:brightness-110 active:scale-95 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 group mt-4">
                 {isLogin ? "Authenticate" : "Deploy Account"}

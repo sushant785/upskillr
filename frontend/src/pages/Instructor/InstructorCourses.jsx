@@ -162,7 +162,7 @@ const CourseCard = ({ course, navigate, index }) => {
         <div className="flex items-center gap-4 text-xs font-bold text-[var(--text-muted)] mb-6">
           <div className="flex items-center gap-1.5 bg-[var(--bg-input)] px-2 py-1 rounded-md">
             <Users size={12} className="text-blue-500" />
-            <span>{course.studentsCount || 0}</span>
+            <span>{course.studentCount || 0}</span>
           </div>
           <div className="flex items-center gap-1.5 bg-[var(--bg-input)] px-2 py-1 rounded-md">
             <Star size={12} className="text-yellow-500" />
@@ -179,9 +179,9 @@ const CourseCard = ({ course, navigate, index }) => {
             <Edit3 size={14} /> Manage
           </button>
           
-          <button className="p-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 transition-all">
+          {/* <button className="p-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30 transition-all">
             <Trash2 size={16} />
-          </button>
+          </button> */}
         </div>
       </div>
     </motion.div>

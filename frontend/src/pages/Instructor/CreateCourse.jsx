@@ -281,12 +281,12 @@ const CreateCourse = () => {
                 {loading ? <Loader2 className="animate-spin" /> : "Create Course"}
               </button>
               
-              <button 
+              {/* <button 
                 type="button"
                 className="w-full py-4 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] text-[var(--text-muted)] font-bold text-sm uppercase tracking-wider hover:bg-[var(--bg-card)] transition-all"
               >
                 Save as Draft
-              </button>
+              </button> */}
             </div>
 
             {/* Quick Tips */}
