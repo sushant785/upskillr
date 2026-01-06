@@ -191,10 +191,10 @@ const CoursePlayer = () => {
         </div>
       </nav>
 
-      <div className="flex flex-grow overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-grow lg:overflow-hidden">
         
         {/* --- Video Area  --- */}
-        <main className="flex-grow overflow-y-auto bg-[var(--bg-main)] flex flex-col">
+        <main className="w-full lg:flex-grow overflow-y-auto bg-[var(--bg-main)] flex flex-col">
           <div className="aspect-video bg-black w-full relative shadow-2xl shrink-0">
             {currentLesson?.videoUrl ? (
              <video 
@@ -211,7 +211,7 @@ const CoursePlayer = () => {
             )}
           </div>
 
-         <div className="p-8 max-w-4xl bg-[var(--bg-main)]">
+         <div className="p-4 lg:p-8 max-w-4xl bg-[var(--bg-main)]">
   
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex flex-col gap-2">
@@ -257,7 +257,7 @@ const CoursePlayer = () => {
         </main>
 
         {/* --- Course Content Sidebar --- */}
-        <aside className="w-[400px] shrink-0 bg-[var(--bg-card)] border-l border-[var(--border-subtle)] flex flex-col shadow-2xl transition-colors duration-300">
+        <aside className="w-full lg:w-[400px] shrink-0 bg-[var(--bg-card)] border-t lg:border-t-0 lg:border-l border-[var(--border-subtle)] flex flex-col shadow-2xl h-[50vh] lg:h-full transition-colors duration-300">
           <div className="p-6 border-b border-[var(--border-subtle)] flex items-center justify-between">
             <h3 className="font-black text-xs uppercase tracking-widest text-[var(--text-muted)]">Course Content</h3>
           </div>

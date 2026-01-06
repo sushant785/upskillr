@@ -5,7 +5,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import { 
   PlayCircle, Clock, Globe, Users, 
-  Award, ShieldCheck, CheckCircle2, ChevronRight 
+  Award, ShieldCheck, CheckCircle2, ChevronRight, 
+  ChevronLeft
 } from 'lucide-react';
 
 const CourseDetail = () => {
@@ -39,6 +40,16 @@ const CourseDetail = () => {
       <div className="bg-[var(--bg-card)] py-12 px-6 md:px-20 border-b border-[var(--border-subtle)]">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
+
+            <button onClick={() => navigate(-1)} 
+            className="mb-6 flex items-center gap-2 text-gray-400 hover:text-emerald-500
+                       hover:translate-x-[-2px] transition-all duration-200">
+             <ChevronLeft size={18} />
+             Back
+            </button>
+
+
+
             <nav className="flex gap-2 text-emerald-500 text-xs font-bold mb-4 uppercase tracking-widest">
               <span>Development</span> <ChevronRight size={14} /> <span>Web Dev</span>
             </nav>
