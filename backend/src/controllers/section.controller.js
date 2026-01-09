@@ -45,3 +45,22 @@ export const deleteSection = async (req, res) => {
     res.status(500).json({ message: "Failed to delete section" });
   }
 };
+
+export const reorderLessons = async (req, res) => {
+  try {
+    const { lessonIds } = req.body; // Array of IDs in the NEW order
+
+    const updatePromises = lessonIds.map((lessonId, index) => {
+      return Lesson.findByIdAndUpdate(lessonId, { 
+        $set: { order: index + 1 } 
+      });
+    });
+
+    await Promise.all(updatePromises);
+
+    res.status(200).json({ message: "Reorder successful" });
+  } catch (error) {
+    console.error("Reorder Error:", error);
+    res.status(500).json({ message: "Failed to save lesson order" });
+  }
+};

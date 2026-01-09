@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence,Reorder } from 'framer-motion';
 import { 
   Plus, PlayCircle, FileText, 
   Trash2, GripVertical, 
@@ -151,62 +151,76 @@ const CourseBuilder = () => {
     
     setUploading(true);
     try {
-      // 1. UPDATE TITLE (If changed)
-      // Assuming you have a standard PUT route for basic details. 
-      // If not, you might need to add one, or rely purely on the video update logic below.
+
       if (lessonForm.title !== editingLesson.title) {
         await api.put(`/instructor/videos/${editingLesson._id}`, { 
           title: lessonForm.title 
         });
       }
 
-      // 2. REPLACE VIDEO (If a new file was selected)
       if (lessonForm.video) {
         toast.info("Uploading new video... do not close.");
 
-        // STEP A: Get Presigned URL
-        // Make sure this route matches where you mounted 'updateRouter' in your backend
         const { data } = await api.post('/instructor/update-upload', { 
           videoId: editingLesson._id, 
           fileType: lessonForm.video.type 
         });
 
-        // STEP B: Upload to S3 (Directly)
         await axios.put(data.uploadUrl, lessonForm.video, {
           headers: { "Content-Type": lessonForm.video.type },
           onUploadProgress: (progressEvent) => {
-            // Optional: You could add a progress bar state here
             console.log("Upload Progress:", Math.round((progressEvent.loaded * 100) / progressEvent.total) + "%");
           }
         });
 
-        // STEP C: Finalize & Delete Old Video
         await api.post('/instructor/update-delete', {
           videoId: editingLesson._id,
           newFileKey: data.newFileKey
-          // We don't send oldFileKey because we fixed the backend to find it automatically!
         });
       }
 
-      // 3. UPDATE LOCAL STATE (Reflect changes in UI immediately)
       setSections(prev => prev.map(sec => ({
         ...sec,
         lessons: sec.lessons.map(l => 
           l._id === editingLesson._id 
-            ? { ...l, title: lessonForm.title } // Update title
+            ? { ...l, title: lessonForm.title } 
             : l
         )
       })));
 
       toast.success("Lesson updated successfully!");
-      setEditingLesson(null); // Close Modal
-      setLessonForm({ title: '', video: null, resource: null }); // Reset Form
+      setEditingLesson(null); 
+      setLessonForm({ title: '', video: null, resource: null }); 
 
     } catch (error) {
       console.error("Update Error:", error);
       toast.error("Failed to update lesson");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleReorder = (newOrder, sectionId) => {
+    setSections(prev => prev.map(sec => {
+      if (sec._id === sectionId) {
+        return { ...sec, lessons: newOrder };
+      }
+      return sec;
+    }));
+  };
+
+  const handleDragEnd = async (sectionId, newLessons) => {
+    try {
+      const lessonIds = newLessons.map(l => l._id);
+      
+      await api.put(`/instructor/courses/${courseId}/sections/${sectionId}/reorder-lessons`, { 
+        lessonIds 
+      });
+      
+      toast.success("Order saved!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save order");
     }
   };
 
@@ -387,7 +401,7 @@ const CourseBuilder = () => {
                       <div className="p-4 space-y-3">
                         {(!section.lessons || section.lessons.length === 0) && <p className="text-xs text-[var(--text-muted)] italic pl-2">No lessons yet.</p>}
 
-                        {section.lessons && section.lessons.map((lesson) => (
+                        {/* {section.lessons && section.lessons.map((lesson) => (
                           <div key={lesson._id} className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] group">
                             <div className="flex items-center gap-4">
                               <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500"><PlayCircle size={18} /></div>
@@ -409,7 +423,62 @@ const CourseBuilder = () => {
                               </button>
                             </div>
                           </div>
-                        ))}
+                        ))} */}
+
+                        <Reorder.Group 
+                          axis="y" 
+                          values={section.lessons || []} 
+                          onReorder={(newOrder) => handleReorder(newOrder, section._id)}
+                          className="space-y-3"
+                        >
+                          {section.lessons && section.lessons.map((lesson) => (
+                            <Reorder.Item 
+                              key={lesson._id} 
+                              value={lesson}
+                              // Trigger save when user releases the mouse
+                              onDragEnd={() => handleDragEnd(section._id, section.lessons)}
+                              className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] group cursor-grab active:cursor-grabbing shadow-sm"
+                              whileDrag={{ scale: 1.02, boxShadow: "0 10px 20px rgba(0,0,0,0.1)", zIndex: 50 }}
+                            >
+                              <div className="flex items-center gap-4">
+                                {/* Grip Icon for visual drag cue */}
+                                <div className="text-[var(--text-muted)] hover:text-[var(--text-main)] cursor-grab active:cursor-grabbing">
+                                  <GripVertical size={16} />
+                                </div>
+                                
+                                <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                                  <PlayCircle size={18} />
+                                </div>
+                                <h4 className="text-sm font-bold text-[var(--text-main)] select-none">
+                                  {lesson.title}
+                                </h4>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button 
+                                  onClick={(e) => {
+                                    // Stop drag event from interfering with click
+                                    e.stopPropagation(); 
+                                    setEditingLesson(lesson);
+                                    setLessonForm({ title: lesson.title, video: null, resource: null });
+                                  }}
+                                  className="p-2 hover:bg-emerald-500/10 text-[var(--text-muted)] hover:text-emerald-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                >
+                                  <Pencil size={14} />
+                                </button>
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteLesson(lesson._id, section._id)
+                                  }} 
+                                  className="p-2 hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </Reorder.Item>
+                          ))}
+                        </Reorder.Group>
                         
                         <button onClick={() => { setCurrentSectionId(section._id); setIsAddingLesson(true); }} className="w-full py-3 rounded-xl border border-dashed border-[var(--border-subtle)] text-[var(--text-muted)] text-xs font-bold uppercase tracking-widest hover:bg-[var(--bg-input)] hover:border-emerald-500/50 hover:text-emerald-500 transition-all flex items-center justify-center gap-2">
                           <Plus size={16} /> Add Lesson
