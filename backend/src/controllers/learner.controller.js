@@ -69,6 +69,8 @@ export const getMyEnrolledCourses = async (req, res) => {
         console.error("Error fetching enrolled courses:", err);
         res.status(500).json({ message: err.message });
     }
+
+    
 };
 
 
@@ -206,7 +208,7 @@ export const updateLessonProgress = async (req, res) => {
     
     const lessonsCount = await Lesson.countDocuments({ course: courseId });
     progress.progressPercent = lessonsCount > 0 ? Math.round((progress.completedLessons.length / lessonsCount) * 100) : 0;
-
+    progress.isCompleted = progress.progressPercent === 100;
     await progress.save();
 
     
@@ -222,36 +224,36 @@ export const updateLessonProgress = async (req, res) => {
 };
 
 
+
+
 export const getLearnerDashboard = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const enrolledCourses = await Enrollment.countDocuments({ user: userId });
-    const completedCourses = await Progress.countDocuments({
-      user: userId,
-      isCompleted: true
-    });
-    const ongoingCourses = enrolledCourses - completedCourses;
+    
+    const enrolledCoursesCount = await Enrollment.countDocuments({ user: userId });
 
-    const continueLearning = await Progress.find({
-      user: userId,
-      isCompleted: false
-    })
-      .sort({ updatedAt: -1 })
-      .limit(3)
-      .populate("course", "title thumbnail");
+    
+    const allProgress = await Progress.find({ user: userId }).populate("course", "title thumbnail");
 
-    const validContinueLearning = continueLearning.filter(p => p.course != null);
+    
+    const completedCourses = allProgress.filter(p => p.progressPercent === 100);
+    const ongoingCourses = allProgress.filter(p => p.progressPercent < 100);
+
+    
+    const continueLearning = ongoingCourses
+      .sort((a, b) => b.updatedAt - a.updatedAt)
+      .slice(0, 3);
 
     res.status(200).json({
       role: "learner",
-      enrolledCourses,
-      ongoingCourses,
-      completedCourses,
-      continueLearning: validContinueLearning.map((p) => ({
-        courseId: p.course._id,
-        title: p.course.title,
-        thumbnail: p.course.thumbnail,
+      enrolledCourses: enrolledCoursesCount,
+      ongoingCourses: ongoingCourses.length,
+      completedCourses: completedCourses.length,
+      continueLearning: continueLearning.map((p) => ({
+        courseId: p.course?._id,
+        title: p.course?.title,
+        thumbnail: p.course?.thumbnail,
         progressPercent: p.progressPercent,
         lastAccessedLesson: p.lastAccessedLesson
       }))

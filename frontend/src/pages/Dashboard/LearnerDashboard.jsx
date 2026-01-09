@@ -9,7 +9,10 @@ import {
 import api from '../../utils/api';
 
 const LearnerDashboard = () => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({enrolledCourses: 0,
+  ongoingCourses: 0,
+  completedCourses: 0,
+  continueLearning: []});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [streakValue, setStreakValue] = useState(0);
@@ -56,11 +59,26 @@ const LearnerDashboard = () => {
     handleStreak();
   }, []);
 
+ 
   const calculateMomentum = () => {
-    if (!data?.continueLearning?.length) return 0;
-    const total = data.continueLearning.reduce((acc, c) => acc + c.progressPercent, 0);
-    return Math.round(total / data.continueLearning.length);
-  };
+    const ongoing = data?.continueLearning || [];
+    
+    
+    if (ongoing.length === 0) return 0;
+
+    
+    const weights = [0.7, 0.3];
+    
+    const activeMomentum = ongoing.reduce((acc, course, index) => {
+      
+      const weight = weights[index] || 0;
+      
+      
+      return acc + (course.progressPercent * weight);
+    }, 0);
+
+    return Math.round(activeMomentum);
+ };
 
   if (isLoading) return (
     <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center">
@@ -77,9 +95,10 @@ const LearnerDashboard = () => {
     </div>
   );
 
-  const completedCount = data?.continueLearning?.filter(c => c.progressPercent === 100).length || 0;
-  const ongoingCount = data?.continueLearning?.filter(c => c.progressPercent < 100).length || 0;
-
+    // const completedCount = data?.continueLearning?.filter(c => c.progressPercent === 100).length || 0;
+    // const ongoingCount = data?.continueLearning?.filter(c => c.progressPercent < 100).length || 0;
+    const completedCount = data.completedCourses || 0;
+    const ongoingCount = data.ongoingCourses || 0;
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col overflow-x-hidden">
       <main className="flex-1">
@@ -147,7 +166,7 @@ const LearnerDashboard = () => {
                 <LocalNotes />
                 <div className="p-6 rounded-2xl md:rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 shadow-sm">
                    <p className="text-[10px] leading-relaxed text-[var(--text-muted)] font-bold uppercase tracking-tight">
-                     Next Milestone: Complete <span className="text-emerald-600">"{data.continueLearning[0]?.title || 'Protocol'}"</span>
+                     Next Milestone: Complete <span className="text-emerald-600">"{data.continueLearning[0]?.title || 'All Protocols Clear.'}"</span>
                    </p>
                 </div>
               </aside>
