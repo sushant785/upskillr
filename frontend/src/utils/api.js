@@ -35,30 +35,25 @@ api.interceptors.response.use(
       originalRequest._retry = true; 
 
       try {
-        // A. Call the refresh endpoint
-        // FIX: Use the dynamic BASE_URL variable instead of hardcoded localhost
         const refreshResponse = await axios.get(`${BASE_URL}/auth/refresh`, {
           withCredentials: true 
         });
 
-        // B. Get the new token
         const newAccessToken = refreshResponse.data.accessToken;
         const user = refreshResponse.data.user;
 
-        // C. Update LocalStorage
         localStorage.setItem('auth', JSON.stringify({ token: newAccessToken, user: user }));
 
-        // D. Update the header of the FAILED request with the NEW token
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         
-        // E. Retry the original request using the 'api' instance
         return api(originalRequest);
 
       } catch (refreshError) {
-        // F. If Refresh fails, logout
         console.log("Session expired completely.");
         localStorage.removeItem('auth');
-        window.location.href = '/'; 
+        if (window.location.pathname !== '/' && window.location.pathname !== '/login') {
+            window.location.href = '/'; 
+        }
         return Promise.reject(refreshError);
       }
     }
