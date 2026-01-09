@@ -25,7 +25,6 @@ const LearnerDashboard = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setData(response.data);
-        console.log(response.data)
       } catch (err) {
         setError("Failed to initialize system overview.");
       } finally {

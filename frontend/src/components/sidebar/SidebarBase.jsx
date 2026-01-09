@@ -101,19 +101,23 @@ const handleLogout = async () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => toggleSidebar(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 w-full p-3.5 rounded-xl transition-all
-                  ${
-                    isActive
-                      ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                      : 'text-[var(--text-muted)] hover:bg-[var(--bg-input)]'
-                  }`
-                }
+                
               >
-                <div className={({ isActive }) => isActive ? 'text-emerald-600' : ''}>
-                    {item.icon}
-                </div>
-                <span className="font-bold text-sm">{item.label}</span>
+                 {({ isActive }) => (
+                    <div
+                      className={`flex items-center gap-3 w-full p-3.5 rounded-xl transition-all
+                        ${
+                          isActive
+                            ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                            : 'text-[var(--text-muted)] hover:bg-[var(--bg-input)]'
+                        }`}
+                    >
+                      <div className={isActive ? 'text-emerald-600' : ''}>
+                        {item.icon}
+                      </div>
+                      <span className="font-bold text-sm">{item.label}</span>
+                    </div>
+                  )}
               </NavLink>
             ))}
           </nav>
