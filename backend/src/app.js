@@ -14,7 +14,10 @@ const app = express();
 dotenv.config();
 
 app.use(cors({
-  origin: 'http://localhost:5174', 
+  origin: [
+    "http://localhost:5174",         
+    "https://upskillr-tau.vercel.app"   
+  ], 
   credentials: true,               // Required to allow cookies/refresh tokens
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"]
