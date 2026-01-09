@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
@@ -53,6 +52,7 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ avgRating: 0, totalReviews: 0,studentCount:0 });
   const [error, setError] = useState(null);
+  const [reviews, setReviews] = useState([]); 
   const formatCount = (num) => {
     return num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
   };
@@ -93,6 +93,29 @@ const CourseDetail = () => {
       if (courseId) fetchCourseStats();
     }, [courseId]);
 
+
+    useEffect(() => {
+  const fetchReviews = async () => {
+    try {
+      const res = await api.get(`/learner/course/${courseId}/reviews`);
+      
+      
+      setReviews(res.data.reviews || []); 
+      
+      
+      if(res.data.avgRating) {
+        setStats(prev => ({
+          ...prev,
+          avgRating: res.data.avgRating,
+          totalReviews: res.data.totalReviews
+        }));
+      }
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    }
+  };
+  if (courseId) fetchReviews();
+}, [courseId]);
   
 
 
@@ -140,7 +163,7 @@ const CourseDetail = () => {
                 <Users size={18} className="text-emerald-500"/> {stats.studentCount.toLocaleString()} Students
               </div>
               <div className="flex items-center gap-2">
-                <Star size={18} className="text-emerald-500"/> {stats.avgRating} 
+                <Star size={18} className="text-emerald-500"/> {Number(stats.avgRating).toFixed(1)}
               </div>
               <div className="flex items-center gap-2">
                 <MessageSquare size={18} className="text-emerald-500"/> {stats.totalReviews} reviews
@@ -160,8 +183,8 @@ const CourseDetail = () => {
                 alt="Preview" 
               />
               <div className="text-3xl font-black mb-2 text-[var(--text-main)]">
-                ${course.price} 
-                <span className="text-sm text-[var(--text-muted)] line-through font-normal ml-2">$199</span>
+                ₹{course.price}
+          
               </div>
               <p className="text-emerald-500 text-xs font-black mb-6 tracking-widest uppercase">
                 75% OFF - Limited Time
@@ -185,9 +208,10 @@ const CourseDetail = () => {
                   This course includes:
                 </p>
                 <ul className="space-y-3 text-sm text-[var(--text-muted)] font-medium">
-                  <li className="flex items-center gap-3"><PlayCircle size={16} className="text-emerald-500" /> 52 hours on-demand video</li>
+                  <li className="flex items-center gap-3"><PlayCircle size={16} className="text-emerald-500" /> On-demand video lectures</li>
                   <li className="flex items-center gap-3"><ShieldCheck size={16} className="text-emerald-500" /> Full lifetime access</li>
-                  <li className="flex items-center gap-3"><Award size={16} className="text-emerald-500" /> Certificate of completion</li>
+                  
+
                 </ul>
               </div>
             </div>
@@ -198,17 +222,59 @@ const CourseDetail = () => {
       {/* Main Content Area */}
       <div className="max-w-6xl mx-auto px-6 md:px-20 py-16">
         <div className="lg:w-2/3">
-          <div className="bg-[var(--bg-card)] p-8 rounded-3xl border border-[var(--border-subtle)] mb-12 shadow-sm">
-            <h3 className="text-xl font-black mb-6 uppercase tracking-tight">What you'll learn</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Note: In a real app, map through course.learningOutcomes if available */}
-              {['Build 16 web projects', 'Master modern ES6+', 'Work with MongoDB', 'Deploy to production'].map((item, i) => (
-                <div key={i} className="flex items-start gap-3 text-sm text-[var(--text-muted)] font-medium">
-                  <CheckCircle2 size={18} className="text-emerald-500 shrink-0" /> {item}
+          {/* --- Course Reviews Section --- */}
+          
+<div className="bg-[var(--bg-card)] p-8 rounded-3xl border border-[var(--border-subtle)] mb-12 shadow-sm">
+  <div className="flex items-center justify-between mb-8">
+    <h3 className="text-xl font-black uppercase tracking-tight">Student Reviews</h3>
+    <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+      <Star size={16} className="text-amber-400 fill-amber-400" />
+      <span className="text-sm font-black text-emerald-400">{Number(stats.avgRating).toFixed(1)} / 5.0</span>
+    </div>
+  </div>
+
+  {reviews.length > 0 ? (
+    <div className="space-y-6">
+      <div className="max-h-[500px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-emerald-500/20">
+      {reviews.map((review) => (
+        <div key={review._id} className="py-6 border-b border-[var(--border-subtle)] first:pt-0 last:border-0 last:pb-0">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              {/* User Avatar Placeholder */}
+              <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center font-bold text-emerald-500 border border-emerald-500/20">
+                {review.user?.name?.charAt(0) || 'U'}
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white leading-none mb-1">{review.user?.name || 'Learner'}</p>
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      size={10} 
+                      className={i < review.rating ? "text-amber-400 fill-amber-400" : "text-slate-600"} 
+                    />
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
+            <span className="text-[10px] font-bold text-slate-500 uppercase">
+              {new Date(review.createdAt).toLocaleDateString()}
+            </span>
           </div>
+          <p className="text-[var(--text-muted)] text-sm leading-relaxed italic font-medium mt-3">
+            "{review.comment}"
+          </p>
+        </div>
+      ))}
+      </div>
+    </div>
+  ) : (
+    <div className="text-center py-10 border-2 border-dashed border-[var(--border-subtle)] rounded-2xl">
+      <MessageSquare className="mx-auto mb-3 text-slate-600" size={32} />
+      <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">No reviews yet for this course</p>
+    </div>
+  )}
+</div>
 
           <h3 className="text-2xl font-black mb-8 uppercase tracking-tighter">Course Content</h3>
           <div className="space-y-4">

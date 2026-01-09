@@ -31,6 +31,7 @@ app.use("/api/instructor", uploadRoute);
 app.use("/api/instructor",instructorRoute);
 app.use('/api/instructor',updateRoute)
 app.use("/api/learner", learnerRoutes);
-app.use('/api/review',reviewRouter)
+app.use('/api/review',reviewRouter);
+app.use('/api/learner', reviewRouter);
 
 export default app;

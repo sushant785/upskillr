@@ -66,6 +66,14 @@ export const getReview = async (req,res) =>{
 
     let {course} = req.params
     try{
+
+      const reviewsList = await Review.find({ course: course })
+            .populate('user', 'name') // Connects to User model to get the name
+            .sort({ createdAt: -1 });
+
+
+
+
         let reviews = await Review.aggregate([
             {
                 $match:{course:new mongoose.Types.ObjectId(course)}
@@ -84,7 +92,8 @@ export const getReview = async (req,res) =>{
 
         return res.status(200).json({
             avgRating,
-            totalReviews
+            totalReviews,
+            reviews: reviewsList
         })
     }
     catch(err){
