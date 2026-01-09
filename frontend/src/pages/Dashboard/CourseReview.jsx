@@ -46,6 +46,7 @@ const CourseReviewPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState(null);
   const [shake, setShake] = useState(false);
+  const [stats, setStats] = useState({ avgRating: 0, totalReviews: 0 });
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
@@ -61,6 +62,8 @@ const CourseReviewPage = () => {
     };
     if (courseId) fetchCourseDetails();
   }, [courseId]);
+
+  
 
   const triggerShake = () => {
     setShake(true);

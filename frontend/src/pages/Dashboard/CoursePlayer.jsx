@@ -25,6 +25,7 @@ const CoursePlayer = () => {
   const [completedLessons, setCompletedLessons] = useState([]); 
   const [showCelebration, setShowCelebration] = useState(false);
   const initialLessonId = searchParams.get('lessonId'); 
+  
 
 
   useEffect(() => {

@@ -108,7 +108,9 @@ export const enrollInCourse = async (req, res) => {
           $inc: {studentCount:1}
         })
 
-        res.status(201).json({ message: "Enrolled successfully", enrollment });
+        res.status(201).json({ message: "Enrolled successfully", enrollment ,
+          // totalStudents:enrollment.course.studentCount
+        });
 
     } catch (err) {
         res.status(500).json({ message: "Internal Server Error", error: err.message });
@@ -292,3 +294,24 @@ export const updateLastAccessed = async (req,res) => {
     res.status(500).json({message : "Failed to update marker"})
   }
 }
+
+export const getCourseHeaderStats = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+
+        // Fetch everything in one go from the Course document
+        const course = await Course.findById(courseId).select(
+            "averageRating totalReviews studentCount title thumbnail"
+        );
+
+        if (!course) return res.status(404).json({ message: "Course not found" });
+
+        res.status(200).json({
+            averageRating: course.averageRating || 0,
+            totalReviews: course.totalReviews || 0,
+            studentCount: course.studentCount || 0
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Server error" });
+    }
+};

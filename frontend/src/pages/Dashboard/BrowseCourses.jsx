@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useParams } from 'react-router-dom';
 import api from '../../utils/api';
 import { Search, Filter, Star, Clock, Users, PlayCircle , Info} from 'lucide-react';
 import {useToast} from "../../context/ToastContext"
@@ -11,6 +11,9 @@ const BrowseCourses = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const toast = useToast();
+  const [stats, setStats] = useState({ avgRating: 0, totalReviews: 0,studentCount:0 });
+  const [error, setError] = useState(null);
+  const { courseId } = useParams();
 
 
   const categories = ['All', 'Development', 'Design', 'Business', 'Marketing', 'Data Science'];
@@ -31,6 +34,24 @@ const BrowseCourses = () => {
   };
   fetchCourses();
 }, []);
+
+  useEffect(() => {
+        const fetchCourseStats = async () => {
+          try {
+            const response = await api.get(`/learner/course/${courseId}/header-stats`);
+            setStats({
+              avgRating: response.data.averageRating || 0,
+              totalReviews: response.data.totalReviews || 0,
+              studentCount: response.data.studentCount || 0
+            });
+            console.log(response.data);
+          } catch (err) {
+            setError("Failed to fetch course statistics.");
+          }
+        };
+
+        if (courseId) fetchCourseStats();
+    }, [courseId]);
 
 
 const handleEnroll = async (courseId) => {
@@ -135,8 +156,8 @@ const handleEnroll = async (courseId) => {
     </p>
 
     <div className="flex items-center gap-4 mb-6 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-      <span className="flex items-center gap-1"><Star size={14} className="text-amber-400" /> 4.8</span>
-      <span className="flex items-center gap-1"><Users size={14} /> 1.2k Students</span>
+      <span className="flex items-center gap-1"><Star size={14} className="text-amber-400" />{stats.avgRating}</span>
+      <span className="flex items-center gap-1"><Users size={14} /> {stats.studentCount.toLocaleString()} students</span>
     </div>
 
     {/* Buttons Container */}

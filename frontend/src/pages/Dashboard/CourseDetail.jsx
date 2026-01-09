@@ -6,14 +6,58 @@ import api from '../../utils/api';
 import { 
   PlayCircle, Clock, Globe, Users, 
   Award, ShieldCheck, CheckCircle2, ChevronRight, 
-  ChevronLeft
+  ChevronLeft,Star,MessageSquare
 } from 'lucide-react';
+
+const CourseSkeleton = () => (
+  <div className="min-h-screen bg-[var(--bg-main)] animate-pulse">
+    <div className="bg-[var(--bg-card)] py-12 px-6 md:px-20 border-b border-[var(--border-subtle)]">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-12">
+        <div className="lg:col-span-2">
+          <div className="h-4 w-20 bg-gray-700/50 rounded mb-6" />
+          <div className="h-3 w-32 bg-emerald-500/20 rounded mb-4" />
+          <div className="h-12 w-3/4 bg-gray-700/50 rounded-lg mb-6" />
+          <div className="h-4 w-full bg-gray-700/30 rounded mb-2" />
+          <div className="h-4 w-2/3 bg-gray-700/30 rounded mb-8" />
+          <div className="flex gap-6">
+             {[1, 2, 3, 4].map(i => <div key={i} className="h-5 w-24 bg-gray-700/40 rounded-full" />)}
+          </div>
+        </div>
+        <div className="relative">
+          <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl p-6 shadow-2xl">
+            <div className="w-full aspect-video bg-gray-700/50 rounded-xl mb-6" />
+            <div className="h-8 w-32 bg-gray-700/50 rounded mb-4" />
+            <div className="h-12 w-full bg-emerald-500/30 rounded-xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="max-w-6xl mx-auto px-6 md:px-20 py-16">
+      <div className="lg:w-2/3">
+        <div className="h-40 w-full bg-gray-700/20 rounded-3xl border border-[var(--border-subtle)] mb-12" />
+        <div className="h-8 w-48 bg-gray-700/40 rounded mb-8" />
+        <div className="space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-16 w-full bg-gray-700/20 rounded-2xl border border-[var(--border-subtle)]" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 const CourseDetail = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ avgRating: 0, totalReviews: 0,studentCount:0 });
+  const [error, setError] = useState(null);
+  const formatCount = (num) => {
+    return num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
+  };
+
+
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -29,9 +73,40 @@ const CourseDetail = () => {
     fetchDetails();
   }, [courseId]);
 
-  if (loading) return <div className="min-h-screen bg-[var(--bg-main)] animate-pulse" />;
+  
+
+  useEffect(() => {
+      const fetchCourseStats = async () => {
+        try {
+          const response = await api.get(`/learner/course/${courseId}/header-stats`);
+          setStats({
+            avgRating: response.data.averageRating || 0,
+            totalReviews: response.data.totalReviews || 0,
+            studentCount: response.data.studentCount || 0
+          });
+          console.log(response.data);
+        } catch (err) {
+          setError("Failed to fetch course statistics.");
+        }
+      };
+
+      if (courseId) fetchCourseStats();
+    }, [courseId]);
+
+  
+
+
+  if (loading) return <CourseSkeleton />;
+
+  if (error) return (
+    <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">
+      {error}
+    </div>
+  );
   
   const { course, isEnrolled } = data;
+
+  
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] font-['Poppins'] transition-colors duration-300">
@@ -62,10 +137,13 @@ const CourseDetail = () => {
             
             <div className="flex flex-wrap gap-6 text-sm font-bold text-[var(--text-muted)]">
               <div className="flex items-center gap-2">
-                <Users size={18} className="text-emerald-500"/> 85k Students
+                <Users size={18} className="text-emerald-500"/> {stats.studentCount.toLocaleString()} Students
               </div>
               <div className="flex items-center gap-2">
-                <Clock size={18} className="text-emerald-500"/> 52 Hours Content
+                <Star size={18} className="text-emerald-500"/> {stats.avgRating} 
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageSquare size={18} className="text-emerald-500"/> {stats.totalReviews} reviews
               </div>
               <div className="flex items-center gap-2">
                 <Globe size={18} className="text-emerald-500"/> English
