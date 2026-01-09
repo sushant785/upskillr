@@ -7,6 +7,7 @@ import { BrainCircuit, X, Settings, LogOut, Sun, Moon, ChevronRight } from 'luci
 import axios from 'axios'; 
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
+import api from '../../utils/api.js';
 
 const SidebarBase = ({ navItems, isOpen, toggleSidebar }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -20,9 +21,7 @@ const SidebarBase = ({ navItems, isOpen, toggleSidebar }) => {
 const handleLogout = async () => {
   try {
       // 1. Tell server to delete cookie
-      await axios.post("http://localhost:5000/api/auth/logout", {}, {
-        withCredentials: true 
-      });
+      await api.post("/auth/logout")
 
       // 2. Clear app state
       setAuth({ user: null, accessToken: null, role: null });

@@ -23,6 +23,7 @@ import InstructorCourses from './pages/Instructor/InstructorCourses.jsx';
 import Progress from './pages/Progress.jsx';
 import Enrollments from './pages/Instructor/Enrollments.jsx';
 import LandingPage from './pages/LandingPage.jsx';
+import api from './utils/api.js';
 
 
 function App() {
@@ -34,9 +35,7 @@ function App() {
     const verifySession = async () => {
       try {
         
-        const response = await axios.get("http://localhost:5000/api/auth/refresh", {
-          withCredentials: true 
-        });
+        const response = await api.get("/auth/refresh")
 
         
         setAuth({

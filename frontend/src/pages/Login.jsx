@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import api from '../utils/api';
 
 const UpskillrAuth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -27,15 +28,13 @@ const UpskillrAuth = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+    const endpoint = isLogin ? '/auth/login' : '/auth/register';
     const payload = isLogin 
         ? { email, password } 
         : { name: `${firstName} ${lastName}`, email, password, role };
 
     try {
-        const response = await axios.post(`http://localhost:5000${endpoint}`, payload, {
-          withCredentials: true 
-        });
+        const response = await api.post(endpoint, payload);
 
         if (response.status === 200 || response.status === 201) {
           if(isLogin)

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { User, Mail, Shield, Edit3, Save, Loader2, Eye, EyeOff, Lock } from 'lucide-react';
 import axios from 'axios';
 import { useToast } from '../context/ToastContext';
+import api from '../utils/api';
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState(null);
@@ -25,11 +26,7 @@ const ProfilePage = () => {
 
   const fetchProfile = async () => {
     try {
-      const auth = JSON.parse(localStorage.getItem('auth'));
-      const { data } = await axios.get('http://localhost:5000/api/profile', {
-        headers: { Authorization: `Bearer ${auth?.token}` },
-        withCredentials: true
-      });
+      const { data } = await api.get('/profile');
       const localBio = localStorage.getItem('user_bio') || "";
       setUserData({ ...data, bio: localBio });
       setName(data.name);
@@ -45,12 +42,8 @@ const ProfilePage = () => {
   const handleUpdate = async (type) => {
     setUpdateLoading(true);
     try {
-      const auth = JSON.parse(localStorage.getItem('auth'));
       const payload = type === 'name' ? { name } : { ...passwords };
-      await axios.put('http://localhost:5000/api/profile', payload, {
-        headers: { Authorization: `Bearer ${auth?.token}` },
-        withCredentials: true,
-      });
+      await api.put('/profile', payload);
       if (type === 'name') {
         setUserData({ ...userData, name });
         setIsEditingName(false);
