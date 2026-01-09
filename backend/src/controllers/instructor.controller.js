@@ -6,7 +6,6 @@ import SectionModel from "../models/Section.model.js";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../config/s3.js";
 import crypto from "crypto";
-import { inspect } from "util";
 
 const BUCKET = process.env.AWS_THUMBNAIL_BUCKET;
 
@@ -150,6 +149,9 @@ export const deleteCourse = async (req,res) => {
 
         await LessonModel.deleteMany({ course:course._id})
         await SectionModel.deleteMany({ course: course._id });
+
+        await ProgressModel.deleteMany({ course: course._id });
+        await EnrollmentModel.deleteMany({ course: course._id });
 
         await course.deleteOne()
         res.status(200).json({message:"course and lessons deleted success"})

@@ -5,7 +5,7 @@ import {
   Plus, PlayCircle, FileText, 
   Trash2, GripVertical, 
   ChevronDown, ChevronRight, Save,
-  Video, Globe, Loader2, X, Paperclip, AlertTriangle
+  Video, Globe, Loader2, X, Paperclip, AlertTriangle,Pencil
 } from 'lucide-react';
 import axios from 'axios'; 
 import api from '../../utils/api'; 
@@ -25,6 +25,7 @@ const CourseBuilder = () => {
   
   const [expandedModules, setExpandedModules] = useState({});
   const [isAddingLesson, setIsAddingLesson] = useState(false);
+  const [editingLesson, setEditingLesson] = useState(null);
   const [currentSectionId, setCurrentSectionId] = useState(null);
   
   const [lessonForm, setLessonForm] = useState({ 
@@ -139,6 +140,71 @@ const CourseBuilder = () => {
     } catch (error) {
       console.error("Upload Error:", error);
       toast.error(error.response?.data?.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // --- HANDLE LESSON UPDATE (Edit Logic) ---
+  const handleUpdateLesson = async () => {
+    if (!lessonForm.title) return toast.warning("Title is required");
+    
+    setUploading(true);
+    try {
+      // 1. UPDATE TITLE (If changed)
+      // Assuming you have a standard PUT route for basic details. 
+      // If not, you might need to add one, or rely purely on the video update logic below.
+      if (lessonForm.title !== editingLesson.title) {
+        await api.put(`/instructor/videos/${editingLesson._id}`, { 
+          title: lessonForm.title 
+        });
+      }
+
+      // 2. REPLACE VIDEO (If a new file was selected)
+      if (lessonForm.video) {
+        toast.info("Uploading new video... do not close.");
+
+        // STEP A: Get Presigned URL
+        // Make sure this route matches where you mounted 'updateRouter' in your backend
+        const { data } = await api.post('/instructor/update-upload', { 
+          videoId: editingLesson._id, 
+          fileType: lessonForm.video.type 
+        });
+
+        // STEP B: Upload to S3 (Directly)
+        await axios.put(data.uploadUrl, lessonForm.video, {
+          headers: { "Content-Type": lessonForm.video.type },
+          onUploadProgress: (progressEvent) => {
+            // Optional: You could add a progress bar state here
+            console.log("Upload Progress:", Math.round((progressEvent.loaded * 100) / progressEvent.total) + "%");
+          }
+        });
+
+        // STEP C: Finalize & Delete Old Video
+        await api.post('/instructor/update-delete', {
+          videoId: editingLesson._id,
+          newFileKey: data.newFileKey
+          // We don't send oldFileKey because we fixed the backend to find it automatically!
+        });
+      }
+
+      // 3. UPDATE LOCAL STATE (Reflect changes in UI immediately)
+      setSections(prev => prev.map(sec => ({
+        ...sec,
+        lessons: sec.lessons.map(l => 
+          l._id === editingLesson._id 
+            ? { ...l, title: lessonForm.title } // Update title
+            : l
+        )
+      })));
+
+      toast.success("Lesson updated successfully!");
+      setEditingLesson(null); // Close Modal
+      setLessonForm({ title: '', video: null, resource: null }); // Reset Form
+
+    } catch (error) {
+      console.error("Update Error:", error);
+      toast.error("Failed to update lesson");
     } finally {
       setUploading(false);
     }
@@ -327,9 +393,21 @@ const CourseBuilder = () => {
                               <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500"><PlayCircle size={18} /></div>
                               <h4 className="text-sm font-bold text-[var(--text-main)]">{lesson.title}</h4>
                             </div>
-                            <button onClick={() => handleDeleteLesson(lesson._id, section._id)} className="p-2 hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
-                                <Trash2 size={14} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button 
+                                onClick={() => {
+                                  setEditingLesson(lesson);
+                                  // Pre-fill the form with current data
+                                  setLessonForm({ title: lesson.title, video: null, resource: null });
+                                }}
+                                className="p-2 hover:bg-emerald-500/10 text-[var(--text-muted)] hover:text-emerald-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button onClick={() => handleDeleteLesson(lesson._id, section._id)} className="p-2 hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all">
+                                  <Trash2 size={14} />
+                              </button>
+                            </div>
                           </div>
                         ))}
                         
@@ -467,7 +545,69 @@ const CourseBuilder = () => {
           </motion.div>
         </div>
       )}
+
+
+
+      {/* --- EDIT LESSON MODAL --- */}
+      {editingLesson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-3xl p-8 w-full max-w-lg shadow-2xl relative">
+            <button onClick={() => setEditingLesson(null)} className="absolute top-6 right-6 text-[var(--text-muted)] hover:text-[var(--text-main)]"><X size={20}/></button>
+            
+            <h3 className="text-xl font-bold mb-6 text-[var(--text-main)]">Edit Lesson</h3>
+            
+            <div className="space-y-5">
+              
+              {/* Title Input */}
+              <div className="space-y-2">
+                <label className="text-xs font-black text-[var(--text-muted)] uppercase">Lesson Title</label>
+                <input 
+                    type="text" 
+                    value={lessonForm.title}
+                    onChange={(e) => setLessonForm({...lessonForm, title: e.target.value})}
+                    className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl p-3 text-[var(--text-main)] focus:outline-none focus:border-emerald-500 transition-colors" 
+                />
+              </div>
+
+              {/* Video Replacement Input */}
+              <div className="space-y-2">
+                <label className="text-xs font-black text-[var(--text-muted)] uppercase flex items-center gap-2">
+                  <Video size={14} /> Replace Video (Optional)
+                </label>
+                
+                {/* Show current file status */}
+                <div className="text-xs text-emerald-500 bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20 mb-2">
+                  Current Video: Active
+                </div>
+
+                <input 
+                    type="file" 
+                    accept="video/*"
+                    onChange={(e) => setLessonForm({...lessonForm, video: e.target.files[0]})}
+                    className="w-full text-[var(--text-muted)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-500/10 file:text-blue-500 hover:file:bg-blue-500/20 cursor-pointer" 
+                />
+                <p className="text-[10px] text-[var(--text-muted)]">Upload only if you want to replace the current video.</p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-4 flex gap-3">
+                <button onClick={() => setEditingLesson(null)} className="flex-1 py-3 rounded-xl bg-[var(--bg-input)] hover:brightness-110 text-[var(--text-muted)] font-bold text-sm transition-colors">Cancel</button>
+                <button 
+                    onClick={handleUpdateLesson} 
+                    disabled={uploading}
+                    className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? <Loader2 className="animate-spin" /> : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
+
+
+
 
     {/* --- DELETE CONFIRMATION MODAL --- */}
     <AnimatePresence>
