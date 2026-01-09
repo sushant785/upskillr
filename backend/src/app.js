@@ -16,7 +16,8 @@ dotenv.config();
 app.use(cors({
   origin: [
     "http://localhost:5174",         
-    "https://upskillr-tau.vercel.app"   
+    "https://upskillr-tau.vercel.app",
+    "https://upskillr-lqvb.vercel.app"
   ], 
   credentials: true,               // Required to allow cookies/refresh tokens
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
