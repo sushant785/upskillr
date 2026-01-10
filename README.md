@@ -59,24 +59,111 @@ The platform is designed with role-based authentication, scalable architecture, 
 - MongoDB Atlas
 
 ## 📸 Screenshots
+### 🔐 Authentication 
+<table width="100%">
+  <tr>
+    <td width="33%" align="center">
+      <img src="screenshots/login.png" width="100%" alt="Login"/><br/>
+      <b>Login </b>
+    </td>
+    <td width="33%" align="center">
+      <img src="screenshots/register.png" width="100%" alt="Register"/><br/>
+      <b>Registration</b>
+    </td>
+  </tr>
+</table>
 
-- Instructor Dashboard  
-- Course Creation Page  
-- Learner Course View  
-- Progress Tracking UI  
+### Landing Page
+<tr>
+    <td width="50%" align="center">
+      <img src="screenshots/landing-page.png" width="100%" alt="Landing Page"/><br/>
+  </tr>
 
-### Login Page
-![Login Page](screenshots/loginpage.png)
+### 👨‍🏫 Instructor Experience
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/instructor-dashboard.png" width="100%" alt="Instructor Dashboard"/><br/>
+      <b>Instructor  Dashboard</b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/instructor-create-course.png" width="100%" alt="Create Course"/><br/>
+      <b>Course Creation </b>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/instructor-courses.png" width="100%" alt="Instructor Courses"/><br/>
+      <b>Instructor Courses</b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/instructor-enrollments.png" width="100%" alt="Enrollments"/><br/>
+      <b>Student Enrollments</b>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/instructor-profile.png" width="100%" alt="Instructor Courses"/><br/>
+      <b>Instructor profile</b>
+    </td>
+   
+  </tr>
+</table>
 
+### 👨‍🎓 Learner Experience
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-browse.png" width="100%" alt="Browse Courses"/><br/>
+      <b>Browse Courses </b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-coursedetail.png" width="100%" alt="Course Detail"/><br/>
+      <b>Course Overview</b>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-my-courses.png" width="100%" alt="Course Player"/><br/>
+      <b>My Courses</b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-course-player.png" width="100%" alt="Reviews"/><br/>
+      <b>Interactive Course Player</b>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-course-completion.png" width="100%" alt="Course Completion"/><br/>
+      <b>Course Completion</b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-course-review.png" width="100%" alt="Reviews"/><br/>
+      <b>Student Ratings & Feedback</b>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-progress.png" width="100%" alt="Progress"/><br/>
+      <b>Progress</b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-profile.png" width="100%" alt="Learner Profile"/><br/>
+      <b>Profile</b>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-dashboard.png" width="100%" alt="Learner Dashboard"/><br/>
+      <b>Learner Dashboard</b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/learner-dash-light.png" width="100%" alt="Light Mode"/><br/>
+      <b>Light Mode</b>
+    </td>
+  </tr>
+</table>
 
-### Instructor Courses
-![Instructor Dashboard](screenshots/instructorCourses.png)
-
-### Course Creation
-![Course Creation](screenshots/createCourse.png)
-
-### Edit Course
-![Edit Course](screenshots/editCourse.png)
 
 
 
