@@ -8,6 +8,41 @@ import {
 } from 'lucide-react';
 import api from '../../utils/api';
 
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1, 
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 } 
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 30, opacity: 0, scale: 0.95 },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    scale: 1, 
+    transition: { type: "spring", stiffness: 120, damping: 12 } 
+  }
+};
+
+const statCardVariants = {
+  hidden: { y: 30, opacity: 0, scale: 0.95 },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    scale: 1, 
+    transition: { type: "spring", stiffness: 120, damping: 12 } 
+  },
+  hover: { 
+    y: -5, 
+    scale: 1.02,
+    boxShadow: "0px 10px 30px -5px rgba(16, 185, 129, 0.2)",
+    transition: { duration: 0.3 }
+  }
+};
+
 const LearnerDashboard = () => {
   const [data, setData] = useState({enrolledCourses: 0,
   ongoingCourses: 0,
@@ -100,6 +135,8 @@ const LearnerDashboard = () => {
     const ongoingCount = data.ongoingCourses || 0;
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex flex-col overflow-x-hidden">
+      <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none animate-pulse" />
+    <div className="fixed bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
       <main className="flex-1">
         <div className="max-w-7xl mx-auto p-6 md:p-12">
           
@@ -112,7 +149,7 @@ const LearnerDashboard = () => {
             </p>
           </header>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+          <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-12 relative z-10">
             
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -129,8 +166,8 @@ const LearnerDashboard = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column: Courses */}
-              <div className="lg:col-span-2 space-y-6">
-                <section className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2.5rem] p-6 md:p-10 shadow-sm">
+              <motion.div variants={itemVariants} className="lg:col-span-2 space-y-6">
+                <section className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2.5rem] p-6 md:p-10 shadow-sm relative overflow-hidden backdrop-blur-md">
                   <div className="flex items-center justify-between mb-8">
                     <h3 className="font-black text-xl tracking-tight uppercase">Continue Learning</h3>
                     <button className="text-[10px] font-black uppercase tracking-widest text-emerald-600 border border-emerald-500/20 px-4 py-2 rounded-full hover:bg-emerald-500/10 transition-all">
@@ -157,10 +194,10 @@ const LearnerDashboard = () => {
                     )}
                   </div>
                 </section>
-              </div>
+              </motion.div>
 
               {/* Right Column: Tools */}
-              <aside className="space-y-6">
+              <motion.aside variants={itemVariants} className="space-y-6">
                 <PomodoroTimer />
                 <LocalNotes />
                 <div className="p-6 rounded-2xl md:rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 shadow-sm">
@@ -168,7 +205,7 @@ const LearnerDashboard = () => {
                      Next Milestone: Complete <span className="text-emerald-600">"{data.continueLearning[0]?.title || 'All Protocols Clear.'}"</span>
                    </p>
                 </div>
-              </aside>
+              </motion.aside>
             </div>
           </motion.div>
         </div>
@@ -188,7 +225,7 @@ const LocalNotes = () => {
   };
 
   return (
-    <section className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2.5rem] p-8 shadow-sm">
+    <section className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2.5rem] p-8 shadow-sm relative overflow-hidden backdrop-blur-md">
       <h3 className="font-black text-lg flex items-center gap-2 uppercase mb-4">
         <Edit3 size={18} className="text-emerald-500" /> Study Notes
       </h3>
@@ -203,24 +240,32 @@ const LocalNotes = () => {
 };
 
 const SummaryCard = ({ title, value, icon }) => (
-  <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] p-8 rounded-2xl md:rounded-[2rem] flex items-center justify-between group hover:border-emerald-500/30 transition-all duration-300 shadow-sm">
-    <div>
+  <motion.div 
+    variants={statCardVariants}
+    whileHover="hover"
+    className="bg-[var(--bg-card)] border border-[var(--border-subtle)] p-8 rounded-2xl md:rounded-[2rem] flex items-center justify-between group cursor-default backdrop-blur-md relative overflow-hidden"
+  >
+    <div className="relative z-10">
       <p className="text-[10px] uppercase font-black tracking-widest text-[var(--text-muted)] mb-2">{title}</p>
       <h4 className="text-4xl font-black">{value}</h4>
     </div>
-    <div className="p-4 bg-[var(--bg-input)] rounded-2xl group-hover:scale-110 transition-transform border border-[var(--border-subtle)]">
+    <div className="p-4 bg-[var(--bg-input)] rounded-2xl group-hover:rotate-12 transition-transform border border-[var(--border-subtle)] relative z-10">
       {React.cloneElement(icon, { size: 28 })}
     </div>
-  </div>
+  </motion.div>
 );
 
 const MomentumCard = ({ label, value, unit = "%", icon, color }) => {
     const colorClasses = {
-        emerald: "text-emerald-600 border-emerald-500/20 bg-emerald-500/5",
-        orange: "text-orange-600 border-orange-500/20 bg-orange-500/5"
+        emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+        orange: "text-orange-500 bg-orange-500/10 border-orange-500/20"
     };
     return (
-        <div className={`p-6 rounded-2xl md:rounded-[2rem] border ${colorClasses[color]} flex items-center justify-between shadow-sm`}>
+        <motion.div 
+          variants={statCardVariants}
+          whileHover="hover"
+          className={`p-6 rounded-2xl md:rounded-[2rem] border ${colorClasses[color]} flex items-center justify-between shadow-sm bg-[var(--bg-card)] backdrop-blur-md`}
+        >
             <div className="flex items-center gap-4">
                 <div className="p-3 bg-[var(--bg-input)] rounded-xl border border-[var(--border-subtle)]">{icon}</div>
                 <div>
@@ -231,7 +276,7 @@ const MomentumCard = ({ label, value, unit = "%", icon, color }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
@@ -255,7 +300,7 @@ const PomodoroTimer = () => {
   const seconds = timeLeft % 60;
 
   return (
-    <section className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2.5rem] p-8 shadow-sm">
+    <section className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2.5rem] p-8 shadow-sm relative overflow-hidden backdrop-blur-md">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-black text-lg uppercase flex items-center gap-2">
             <Timer size={20} className="text-blue-500" /> Focus Mode

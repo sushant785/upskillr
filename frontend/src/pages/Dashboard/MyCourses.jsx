@@ -2,6 +2,25 @@ import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 import { PlayCircle, CheckCircle, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion'; 
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1, 
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 } 
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    transition: { type: "spring", stiffness: 120, damping: 14 } 
+  }
+};
+
 
 const MyCourses = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -51,25 +70,43 @@ const MyCourses = () => {
   }
 
   return (
-    <div className="p-8">
+    <div className="font-['Poppins'] min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300 relative overflow-hidden">
+    
+    {/* --- AMBIENT BACKGROUNDS --- */}
+    <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none animate-pulse" />
+    <div className="fixed bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
+
+    <div className="relative z-10 p-6 md:p-12"> {/* Added relative z-10 wrapper */}
         {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <motion.div 
+  initial={{ opacity: 0, x: -20 }}
+  animate={{ opacity: 1, x: 0 }}
+  className="flex justify-between items-center mb-12"
+>
         <div>
             <h1 className="text-3xl font-black text-[var(--text-main)] mb-2 tracking-tight">My Courses</h1>
             <p className="text-[var(--text-muted)]">Continue where you left off</p>
         </div>
-      </div>
+      </motion.div>
 
 
       {enrollments?.length > 0 ? (
         /* Grid Layout  */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div 
+  variants={containerVariants}
+  initial="hidden"
+  animate="visible"
+  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+>
           {enrollments.map((item) => {
             const { course, progressPercent, status } = item;
             return (
-            <div key={item._id} className="group relative bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden 
-             transition-all duration-500 flex flex-col hover:border-emerald-500/50 
-             hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:-translate-y-1">
+            <motion.div 
+      key={item._id} 
+      variants={itemVariants} // Follows the stagger timing
+      whileHover={{ y: -8 }}
+      className="group relative bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 flex flex-col hover:border-emerald-500/50 hover:shadow-[0_0_40px_rgba(16,185,129,0.25)]"
+    >
               
               {/* Thumbnail Section */}
               <div className="relative h-48 overflow-hidden bg-slate-800">
@@ -136,9 +173,9 @@ const MyCourses = () => {
 </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )})}
-        </div>
+        </motion.div>
       ) : (
         /* Empty State */
         <div className="text-center py-24 bg-[var(--bg-card)] rounded-2xl md:rounded-[2.5rem] border border-dashed border-[var(--border-subtle)]">
@@ -150,6 +187,7 @@ const MyCourses = () => {
           </button>
         </div>
       )}
+    </div>
     </div>
   );
 };

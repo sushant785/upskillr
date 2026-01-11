@@ -71,13 +71,15 @@ The platform is designed with role-based authentication, scalable architecture, 
       <b>Registration</b>
     </td>
   </tr>
-</table>
-
-### Landing Page
-<tr>
+  <tr>
     <td width="50%" align="center">
       <img src="screenshots/landing-page.png" width="100%" alt="Landing Page"/><br/>
+      <b>Landing Page</b>
   </tr>
+</table>
+
+
+
 
 ### 👨‍🏫 Instructor Experience
 <table width="100%">
@@ -97,14 +99,18 @@ The platform is designed with role-based authentication, scalable architecture, 
       <b>Instructor Courses</b>
     </td>
     <td width="50%" align="center">
-      <img src="screenshots/instructor-enrollments.png" width="100%" alt="Enrollments"/><br/>
-      <b>Student Enrollments</b>
+      <img src="screenshots/instructor-manage.png" width="100%" alt="Manage"/><br/>
+      <b>Manage Courses</b>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
       <img src="screenshots/instructor-profile.png" width="100%" alt="Instructor Courses"/><br/>
       <b>Instructor profile</b>
+    </td>
+    <td width="50%" align="center">
+      <img src="screenshots/instructor-enrollments.png" width="100%" alt="Enrollments"/><br/>
+      <b>Student Enrollments</b>
     </td>
    
   </tr>

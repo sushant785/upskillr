@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -8,6 +6,25 @@ import {
   Loader2, AlertCircle, User
 } from 'lucide-react';
 import api from '../utils/api';
+
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1, 
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 } 
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    transition: { type: "spring", stiffness: 100, damping: 15 } 
+  }
+};
+
 
 const Progress = () => {
   const [data, setData] = useState({ courses: [], count: 0 });
@@ -44,9 +61,21 @@ const Progress = () => {
   : 0;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 md:space-y-10 px-4 md:px-0 pb-10 text-[var(--text-main)]">
+  <div className="font-['Poppins'] min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] transition-colors duration-300 relative overflow-hidden">
+    
+    {/* --- AMBIENT BACKGROUNDS --- */}
+    <div className="fixed top-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-emerald-600/10 rounded-full blur-[150px] pointer-events-none animate-pulse" />
+    <div className="fixed bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none" />
+
+    {/* --- WRAPPER WITH STAGGER --- */}
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="relative z-10 max-w-6xl mx-auto space-y-6 md:space-y-10 px-4 md:px-0 pb-10"
+    >
       {/* Header & Overall Stats */}
-      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
+      <motion.header variants={itemVariants} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
         <div>
           <h1 className="text-3xl font-black text-[var(--text-main)] mb-2 tracking-tight">
             Performance Analytics
@@ -68,17 +97,20 @@ const Progress = () => {
             <p className="text-xl font-black">#422</p>
           </div> */}
         </div>
-      </header>
+      </motion.header>
 
       {/* Analytics Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <ProgressStatCard icon={<Layout className="text-blue-500" size={20} />} label="Active Enrollments" value={data.count} />
         <ProgressStatCard icon={<Clock className="text-amber-500" size={20} />} label="In Progress" value={inProgressCount} />
         <ProgressStatCard icon={<Trophy className="text-emerald-500" size={20} />} label="Protocols Mastered" value={completedCount} />
-      </div>
+      </motion.div>
 
       {/* Main Content Area */}
-      <section className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm">
+      <motion.section 
+  variants={itemVariants} 
+  className="bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm"
+>
         <div className="p-6 md:p-8 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-card)]">
           <h3 className="font-black text-sm md:text-lg uppercase flex items-center gap-2">
             <BarChart3 size={18} className="text-[var(--brand-primary)]" /> Detailed Log
@@ -112,7 +144,17 @@ const Progress = () => {
             </thead>
             <tbody className="divide-y divide-[var(--border-subtle)]">
               {data.courses.map((item) => (
-                <tr key={item._id} className="group hover:bg-[var(--bg-input)] transition-colors">
+                <motion.tr 
+  key={item._id} 
+  
+  whileHover={{ 
+    y: -4, 
+    backgroundColor: "var(--bg-input)",
+    boxShadow: "0 15px 30px -10px rgba(0, 0, 0, 0.2)" 
+  }}
+  transition={{ type: "spring", stiffness: 500, damping: 25 }}
+  className="group border-b border-[var(--border-subtle)] relative z-0 hover:z-10 hover:border-transparent transition-all"
+>
                   <td className="px-8 py-6">
                     <p className="font-bold text-[var(--text-main)] group-hover:text-[var(--brand-primary)] transition-colors">
                       {item.course?.title || "Unknown Course"}
@@ -132,14 +174,15 @@ const Progress = () => {
                       <ArrowUpRight size={18} />
                     </button>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
           {data.courses.length === 0 && <EmptyState />}
         </div>
-      </section>
-    </div>
+      </motion.section>
+     </motion.div>
+  </div>
   );
 };
 
